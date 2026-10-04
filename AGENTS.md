@@ -4,7 +4,8 @@ Generador de QR para que Maxi venda cartelería a comercios de Argentina. Tipos 
 
 ## Stack
 - Flutter (stable). El primer objetivo es web (PWA); iOS viene después.
-- La estructura de carpetas y la gestión de estado las define el issue de scaffold. Una vez definidas, respétalas.
+- Flutter 3.47.6 (stable), fijado también en CI y Docker.
+- Widgets sin estado para el scaffold; navegación con `Navigator` y `MaterialPageRoute`. Si aparece estado local, usá `StatefulWidget`; no hay gestor de estado global.
 
 ## Verificación obligatoria antes de abrir o actualizar un PR
 - `flutter analyze` sin errores ni warnings
@@ -17,3 +18,35 @@ Generador de QR para que Maxi venda cartelería a comercios de Argentina. Tipos 
 
 ## Prohibido
 - Push directo a `main`, mergear PRs, o agregar secretos o claves de API al repo.
+
+## Estructura
+- `lib/main.dart`: punto de entrada.
+- `lib/src/ui/`: aplicación, pantalla inicial y pantalla Próximamente.
+- `lib/src/domain/`: reservado para lógica pura, independiente de Flutter.
+- `test/`: tests; la navegación inicial está en `widget_test.dart`.
+- `web/`: manifest PWA, página de arranque e íconos por defecto.
+- `ios/`: proyecto nativo generado por Flutter (compilar en macOS con Xcode).
+
+## Desarrollo y verificación
+```sh
+flutter pub get
+flutter run -d chrome
+flutter analyze
+flutter test
+flutter build web --release
+```
+Para iOS, desde macOS con Xcode y un simulador o dispositivo configurado:
+```sh
+flutter devices
+flutter run -d <id-del-dispositivo-ios>
+```
+
+## Contenedor de prueba
+Con Docker y Docker Compose instalados y el daemon activo:
+```sh
+docker compose up --build
+```
+Abrí http://localhost:8080. Las cuatro opciones llevan a Próximamente y permiten
+volver al inicio. El build usa Flutter y la imagen final sirve los archivos con
+nginx. La primera compilación necesita Internet para descargar SDK y dependencias.
+Para detenerlo, usá Ctrl+C y `docker compose down`.
