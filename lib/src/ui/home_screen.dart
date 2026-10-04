@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'coming_soon_screen.dart';
 import 'instagram_screen.dart';
+import 'google_reviews_screen.dart';
 import 'whatsapp_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -34,6 +35,8 @@ class HomeScreen extends StatelessWidget {
                               ? const InstagramScreen()
                               : option == 'WhatsApp'
                               ? const WhatsAppScreen()
+                              : option == 'Google Reseñas'
+                              ? const GoogleReviewsScreen()
                               : ComingSoonScreen(title: option),
                         ),
                       ),
