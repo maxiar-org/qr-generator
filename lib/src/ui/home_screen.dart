@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'coming_soon_screen.dart';
+import 'instagram_screen.dart';
 import 'whatsapp_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -29,7 +30,9 @@ class HomeScreen extends StatelessWidget {
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
-                          builder: (_) => option == 'WhatsApp'
+                          builder: (_) => option == 'Instagram'
+                              ? const InstagramScreen()
+                              : option == 'WhatsApp'
                               ? const WhatsAppScreen()
                               : ComingSoonScreen(title: option),
                         ),
