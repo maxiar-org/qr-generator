@@ -10,6 +10,11 @@ import '../domain/print_variant.dart';
 import '../domain/qr_label_type.dart';
 import 'label_icons.dart';
 
+/// Módulos blancos que hay que reservar alrededor del QR por cada lado,
+/// según la zona de seguridad mínima de la especificación (ver
+/// https://www.qrcode.com/en/howto/code.html/index.html).
+const int qrQuietZoneModules = 4;
+
 /// Genera el PNG en blanco y negro que se imprime en la DT01: QR, ícono del
 /// tipo y un texto corto, con el tamaño exacto de la [PrintVariant] elegida.
 class LabelImageRenderer {
@@ -35,12 +40,7 @@ class LabelImageRenderer {
       height - textHeight - iconHeight - gap * 2 - margin * 2,
     );
 
-    final qrRect = Rect.fromLTWH(
-      (width - qrSize) / 2,
-      margin,
-      qrSize,
-      qrSize,
-    );
+    final qrRect = Rect.fromLTWH((width - qrSize) / 2, margin, qrSize, qrSize);
     final iconTop = qrRect.bottom + gap;
     final textTop = iconTop + iconHeight + gap;
     final textRect = Rect.fromLTWH(
@@ -76,7 +76,11 @@ class LabelImageRenderer {
       errorCorrectLevel: QrErrorCorrectLevel.M,
     );
     final qrImage = QrImage(qrCode);
-    final cellSize = rect.width / qrImage.moduleCount;
+    // `rect` es el área total asignada al QR; la zona de seguridad se
+    // reserva adentro, achicando los módulos en vez de agrandar el área.
+    final cellSize =
+        rect.width / (qrImage.moduleCount + 2 * qrQuietZoneModules);
+    final offset = cellSize * qrQuietZoneModules;
     final darkPaint = Paint()..color = Colors.black;
 
     for (var row = 0; row < qrImage.moduleCount; row++) {
@@ -84,8 +88,8 @@ class LabelImageRenderer {
         if (!qrImage.isDark(row, col)) continue;
         canvas.drawRect(
           Rect.fromLTWH(
-            rect.left + col * cellSize,
-            rect.top + row * cellSize,
+            rect.left + offset + col * cellSize,
+            rect.top + offset + row * cellSize,
             cellSize,
             cellSize,
           ),
@@ -114,10 +118,7 @@ class LabelImageRenderer {
         ),
       ),
     )..layout();
-    painter.paint(
-      canvas,
-      Offset((canvasWidth - painter.width) / 2, top),
-    );
+    painter.paint(canvas, Offset((canvasWidth - painter.width) / 2, top));
   }
 
   void _drawText(Canvas canvas, String text, Rect rect) {
@@ -142,15 +143,12 @@ class LabelImageRenderer {
   }
 
   Future<ui.Image> _toPureBlackAndWhite(ui.Image image) async {
-    final byteData = await image.toByteData(
-      format: ui.ImageByteFormat.rawRgba,
-    );
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
     final pixels = byteData!.buffer.asUint8List();
 
     for (var i = 0; i < pixels.length; i += 4) {
       final luminance =
-          (pixels[i] * 299 + pixels[i + 1] * 587 + pixels[i + 2] * 114) ~/
-          1000;
+          (pixels[i] * 299 + pixels[i + 1] * 587 + pixels[i + 2] * 114) ~/ 1000;
       final value = luminance < 128 ? 0 : 255;
       pixels[i] = value;
       pixels[i + 1] = value;
