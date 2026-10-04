@@ -47,7 +47,7 @@ Con Docker y Docker Compose instalados y el daemon activo:
 docker compose up --build
 ```
 Abrí http://localhost:8080. Instagram genera un QR al perfil ingresado y WhatsApp, un QR
-con un celular argentino y un mensaje opcional. Google Reseñas y Mercado Pago
-llevan a Próximamente. Todas permiten volver al inicio. El build usa Flutter y la imagen final sirve los archivos con
+con un celular argentino y un mensaje opcional. Google Reseñas genera el QR desde un Place ID
+o enlace compatible (ver docs/google-resenas.md). Mercado Pago lleva a Próximamente. Todas permiten volver al inicio. El build usa Flutter y la imagen final sirve los archivos con
 nginx. La primera compilación necesita Internet para descargar SDK y dependencias.
 Para detenerlo, usá Ctrl+C y `docker compose down`.

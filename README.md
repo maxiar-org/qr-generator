@@ -2,7 +2,8 @@
 
 App Flutter para cartelería de comercios de Argentina. Instagram permite generar
 un QR al perfil del comercio y WhatsApp, un QR con un celular argentino y un
-mensaje opcional. Google Reseñas y Mercado Pago muestran Próximamente.
+mensaje opcional. Google Reseñas genera un QR desde un Place ID o enlace
+compatible. Mercado Pago muestra Próximamente.
 
 ## Probar con Docker
 
@@ -62,3 +63,10 @@ Se valida la estructura: no se consulta un padrón de áreas, ni se comprueba qu
 número esté asignado, sea móvil o tenga WhatsApp. Los números ingresados sin
 prefijo móvil se interpretan como celulares argentinos; los fijos y otros países
 quedan fuera de alcance. El formato internacional requiere explícitamente `549`.
+
+## Google Reseñas
+
+Generá el QR pegando un Place ID obtenido con el Finder público de Google o una
+URL de Maps con `query_place_id`. Los links cortos requieren buscar el comercio
+manualmente en Finder, sin configurar una clave propia.
+Consultá [la comparación de opciones y los pasos de prueba](docs/google-resenas.md).
