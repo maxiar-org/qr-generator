@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:qr_generator/main.dart';
+import 'package:qr_generator/src/ui/app.dart';
 
 void main() {
   testWidgets('shows all QR options and opens their placeholder screens', (
     tester,
   ) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const QrGeneratorApp());
 
     expect(find.text('Generador de QR'), findsOneWidget);
     const options = ['WhatsApp', 'Instagram', 'Google Reseñas', 'Mercado Pago'];

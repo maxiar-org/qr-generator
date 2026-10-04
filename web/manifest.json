@@ -1,11 +1,11 @@
 {
-    "name": "qr_generator",
-    "short_name": "qr_generator",
+    "name": "Generador de QR",
+    "short_name": "Generador de QR",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Cartelería con códigos QR para tu comercio.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
