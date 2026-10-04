@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:qr_generator/src/domain/qr_label_type.dart';
 import 'package:qr_generator/src/ui/app.dart';
 
 void main() {
-  testWidgets('shows all QR options and opens their placeholder screens', (
+  testWidgets('shows all QR options and opens their label preview', (
     tester,
   ) async {
     await tester.pumpWidget(const QrGeneratorApp());
 
     expect(find.text('Generador de QR'), findsOneWidget);
-    const options = ['WhatsApp', 'Instagram', 'Google Reseñas', 'Mercado Pago'];
-    for (final option in options) {
-      expect(find.text(option), findsOneWidget);
+    for (final type in QrLabelType.values) {
+      expect(find.text(type.displayName), findsOneWidget);
     }
 
-    for (final option in options) {
-      await tester.tap(find.text(option));
+    for (final type in QrLabelType.values) {
+      await tester.tap(find.text(type.displayName));
       await tester.pumpAndSettle();
-      expect(find.text('Próximamente'), findsOneWidget);
-      expect(find.widgetWithText(AppBar, option), findsOneWidget);
+      expect(find.widgetWithText(AppBar, type.displayName), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('Generador de QR'), findsOneWidget);
