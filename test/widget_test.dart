@@ -1,8 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_generator/src/ui/app.dart';
 
 void main() {
+  testWidgets('generates WhatsApp QR and clears stale results on edits', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(const QrGeneratorApp());
+    await tester.tap(find.text('WhatsApp'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      '(0223) 15 456-7890',
+    );
+    await tester.enterText(find.byType(TextFormField).last, 'Hola & café');
+    await tester.tap(find.text('Generar QR'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QrImageView), findsOneWidget);
+    expect(
+      tester.widget<SelectableText>(find.byType(SelectableText)).data,
+      'https://wa.me/5492234567890?text=Hola%20%26%20caf%C3%A9',
+    );
+    await tester.enterText(find.byType(TextFormField).last, '');
+    await tester.pump();
+    expect(find.byType(QrImageView), findsNothing);
+    await tester.tap(find.text('Generar QR'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QrImageView), findsOneWidget);
+    expect(
+      tester.widget<SelectableText>(find.byType(SelectableText)).data,
+      'https://wa.me/5492234567890',
+    );
+    await tester.enterText(find.byType(TextFormField).first, '123');
+    await tester.tap(find.text('Generar QR'));
+    await tester.pumpAndSettle();
+    expect(find.byType(QrImageView), findsNothing);
+    expect(find.textContaining('Ingresá un celular argentino'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Generador de QR'), findsOneWidget);
+  });
   testWidgets('shows all QR options and opens their placeholder screens', (
     tester,
   ) async {
@@ -14,7 +54,7 @@ void main() {
       expect(find.text(option), findsOneWidget);
     }
 
-    for (final option in options) {
+    for (final option in options.skip(1)) {
       await tester.tap(find.text(option));
       await tester.pumpAndSettle();
       expect(find.text('Próximamente'), findsOneWidget);
