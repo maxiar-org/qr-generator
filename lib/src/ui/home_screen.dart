@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'coming_soon_screen.dart';
+import 'instagram_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -28,7 +29,9 @@ class HomeScreen extends StatelessWidget {
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
-                          builder: (_) => ComingSoonScreen(title: option),
+                          builder: (_) => option == 'Instagram'
+                              ? const InstagramScreen()
+                              : ComingSoonScreen(title: option),
                         ),
                       ),
                     ),

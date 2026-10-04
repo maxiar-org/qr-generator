@@ -46,7 +46,7 @@ Con Docker y Docker Compose instalados y el daemon activo:
 ```sh
 docker compose up --build
 ```
-Abrí http://localhost:8080. Las cuatro opciones llevan a Próximamente y permiten
-volver al inicio. El build usa Flutter y la imagen final sirve los archivos con
+Abrí http://localhost:8080. Instagram genera un QR al perfil ingresado; las otras
+tres opciones llevan a Próximamente. Todas permiten volver al inicio. El build usa Flutter y la imagen final sirve los archivos con
 nginx. La primera compilación necesita Internet para descargar SDK y dependencias.
 Para detenerlo, usá Ctrl+C y `docker compose down`.
