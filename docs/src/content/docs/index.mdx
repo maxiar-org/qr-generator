@@ -1,0 +1,55 @@
+---
+title: Generador de QR
+description: Cartelería con códigos QR para comercios, pensada para que Maxi la use desde el iPhone.
+template: splash
+hero:
+  tagline: Cartelería con códigos QR para comercios argentinos, armada para imprimir en una térmica de 58 mm desde el iPhone.
+  actions:
+    - text: Guía de uso para Maxi
+      link: /qr-generator/guia-de-uso/
+      icon: right-arrow
+      variant: primary
+    - text: Arquitectura
+      link: /qr-generator/arquitectura/
+      icon: document
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Qué es
+
+El **Generador de QR** es una app web (PWA) hecha en Flutter. A partir de un número
+de WhatsApp, un usuario de Instagram o el Place ID de un comercio en Google Maps,
+genera una etiqueta lista para imprimir: QR real, ícono del tipo de contacto y un
+texto corto editable, en el tamaño exacto que necesita la impresora térmica.
+
+## Para quién es
+
+<CardGrid>
+	<Card title="Maxi" icon="pencil">
+		Vende cartelería a comercios. Genera cada etiqueta desde su iPhone, la
+		imprime en su **Detonger DT01** con la app **WePrint** y se la entrega al
+		comercio pegada en mostrador, tarjetero o como adhesivo.
+	</Card>
+	<Card title="Los comercios" icon="seti:plan">
+		Reciben el cartel con el QR ya armado: no necesitan instalar nada ni
+		entender cómo se generó. Solo lo pegan donde los clientes lo vean y lo
+		escaneen.
+	</Card>
+</CardGrid>
+
+## Cómo acceder
+
+La app corre en el navegador, sin instalación de tienda de aplicaciones:
+
+1. Abrí la URL de la app en Safari (en el iPhone) o en Chrome (en la compu).
+2. Para usarla como una app en el iPhone, agregala a la pantalla de inicio: mirá
+   [Instalar la app en el iPhone](/qr-generator/guia-de-uso/instalar-en-iphone/).
+3. Para probarla en la compu con Docker, seguí el
+   [`README.md`](https://github.com/maxiar-org/qr-generator#probar-con-docker)
+   del repositorio.
+
+Para el día a día, el punto de partida es la
+[guía de uso para Maxi](/qr-generator/guia-de-uso/): un apartado por cada tipo de
+QR, con las variantes de impresión y los pasos para imprimir con WePrint.
