@@ -16,6 +16,18 @@ Generador de QR para que Maxi venda cartelería a comercios de Argentina. Tipos 
 - La lógica pura (normalizar números, armar URLs) va en `lib/src/domain/`, con tests unitarios. Los widgets no llevan lógica de negocio.
 - Ramas `agent/<issue>-<slug>`. Un PR por issue, con `Closes #<issue>` y una sección **Entregable visible**.
 
+## Probar la UI (Playwright)
+Para recorrer la app con las herramientas de Playwright, sírvela localmente dentro del contenedor:
+
+```bash
+flutter build web --release
+python3 -m http.server 8765 --directory build/web >/dev/null 2>&1 &
+```
+
+Abre `http://localhost:8765`, espera unos 5 segundos a que cargue Flutter y recorre los flujos. Flujos principales que nunca deben romperse:
+- **WhatsApp:** inicio → WhatsApp → ingresar el número → ver la etiqueta con el QR real → guardar o copiar.
+- **Instagram:** inicio → Instagram → ingresar el usuario → ver la etiqueta con el QR real → guardar o copiar.
+
 ## Prohibido
 - Push directo a `main`, mergear PRs, o agregar secretos o claves de API al repo.
 
