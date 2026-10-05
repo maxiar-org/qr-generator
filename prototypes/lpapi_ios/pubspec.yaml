@@ -1,0 +1,20 @@
+name: lpapi_ios_spike
+description: Prueba de impresión LPAPI exclusiva para iOS.
+publish_to: none
+version: 0.1.0+1
+environment:
+  sdk: ^3.13.5
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_dothantech_lpapi_thermal_printer: 2.7.3
+  qr_generator:
+    path: ../..
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  config:
+    enable-swift-package-manager: false
+  uses-material-design: true
