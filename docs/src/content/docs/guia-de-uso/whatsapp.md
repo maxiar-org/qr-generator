@@ -11,9 +11,11 @@ si el comercio quiere uno.
 ## Pasos
 
 1. En el inicio de la app, tocá **WhatsApp**.
-2. Ingresá el celular del comercio. Aceptás el número nacional de 10 dígitos
-   (con o sin `0` o `15` adelante, con espacios, guiones o paréntesis) o el
-   formato internacional `+549` seguido de esos 10 dígitos.
+2. Ingresá el celular del comercio. Aceptás el número nacional de 10 dígitos,
+   con espacios, guiones o paréntesis, con o sin el `0` antes del código de
+   área y el `15` después del código de área (por ejemplo
+   `011 15 2345-6789`), o el formato internacional `+549` seguido de esos 10
+   dígitos.
 3. Opcionalmente, escribí un mensaje para que aparezca precargado en el chat.
 4. Tocá **Ver etiqueta**: se genera el QR real apuntando a
    `https://wa.me/<número>?text=<mensaje>`.

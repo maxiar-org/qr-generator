@@ -1,0 +1,12 @@
+/*
+ * astro-mermaid fuerza `max-width: 100%; height: auto;` en el SVG para evitar
+ * desbordes, pero eso también lo achica hasta volverlo ilegible cuando el
+ * diagrama es más ancho que el contenedor (ver PR #22, QA ronda 1: texto de
+ * 16px terminaba en ~2px en 390px de ancho). Preferimos que el SVG conserve
+ * su tamaño real y que `pre.mermaid` (que ya tiene `overflow: auto`) scrollee
+ * en vez de comprimir el texto.
+ */
+pre.mermaid svg {
+  max-width: none !important;
+  width: auto !important;
+}

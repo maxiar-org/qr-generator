@@ -42,7 +42,7 @@ lib/
 ## Flujo QR → etiqueta → imagen
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Maxi ingresa el dato\n(celular, usuario, Place ID)"] --> B["domain/\nvalida y normaliza"]
     B --> C["URL del QR\n(qrData)"]
     C --> D["LabelPreviewScreen\n(ui/)"]

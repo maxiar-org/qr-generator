@@ -27,6 +27,7 @@ export default defineConfig({
 					href: 'https://github.com/maxiar-org/qr-generator',
 				},
 			],
+			customCss: ['./src/styles/custom.css'],
 			sidebar: [
 				{
 					label: 'Guía de uso para Maxi',
