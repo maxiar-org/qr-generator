@@ -1,8 +1,9 @@
 # Generador de QR
 
-App Flutter para cartelería de comercios de Argentina. Las cuatro opciones
-(WhatsApp, Instagram, Google Reseñas y Mercado Pago) abren una vista previa de
+App Flutter para cartelería de comercios de Argentina. Google Reseñas genera un QR
+desde un Place ID o enlace compatible y permite abrir su vista previa de
 impresión para la térmica DT01, con selector de variante y texto editable.
+WhatsApp, Instagram y Mercado Pago abren vistas previas con datos de ejemplo.
 
 ## Probar con Docker
 
@@ -54,6 +55,19 @@ La normalización de Instagram acepta de 1 a 30 letras ASCII, números, puntos o
 guiones bajos, ya sea como `@usuario`, `usuario` o un enlace a
 `instagram.com/usuario` (con o sin `www.`, esquema o parámetros de consulta).
 No se verifica que el perfil exista.
+
+## Probar el QR de Google Reseñas
+
+1. Entrá en **Google Reseñas** y pegá el Place ID del comercio obtenido en
+   Place ID Finder, o una URL de Maps con `query_place_id`.
+2. Tocá **Generar QR** y verificá el negocio escaneándolo.
+3. Tocá **Vista previa de impresión** para elegir variante y editar el texto:
+   la etiqueta usa el enlace generado para ese comercio.
+4. Volvé al formulario y editá el dato: el resultado anterior se borra.
+
+Los links cortos y las URLs sin ID explícito requieren buscar el comercio
+manualmente en Finder, sin configurar una clave propia.
+Consultá [la comparación de opciones y los pasos de prueba](docs/google-resenas.md).
 
 ## Guardar y llevar la etiqueta a WePrint desde el iPhone
 

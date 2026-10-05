@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../domain/qr_label_type.dart';
 import 'coming_soon_screen.dart';
+import 'google_reviews_screen.dart';
 import 'instagram_screen.dart';
 import 'whatsapp_screen.dart';
 
@@ -27,6 +28,8 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => switch (type) {
+                            QrLabelType.googleReviews =>
+                              const GoogleReviewsScreen(),
                             QrLabelType.whatsapp => const WhatsAppScreen(),
                             QrLabelType.instagram => const InstagramScreen(),
                             _ => ComingSoonScreen(type: type),

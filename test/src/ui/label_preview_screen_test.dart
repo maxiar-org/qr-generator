@@ -7,6 +7,7 @@ import 'package:qr_generator/src/domain/print_variant.dart';
 import 'package:qr_generator/src/domain/qr_label_type.dart';
 import 'package:qr_generator/src/printing/label_image_renderer.dart';
 import 'package:qr_generator/src/ui/label_preview_screen.dart';
+import 'package:qr_generator/src/ui/export_actions.dart';
 
 /// PNG mínimo (1x1) para no depender del motor gráfico real en estos tests;
 /// el contenido exacto del PNG ya está cubierto por label_image_renderer_test.
@@ -26,7 +27,46 @@ class _FakeRenderer extends LabelImageRenderer {
   }) async => _fakePngBytes;
 }
 
+class _RecordingRenderer extends LabelImageRenderer {
+  final List<String> receivedData = [];
+
+  @override
+  Future<Uint8List> render({
+    required String qrData,
+    required QrLabelType type,
+    required PrintVariant variant,
+    required String text,
+  }) async {
+    receivedData.add(qrData);
+    return _fakePngBytes;
+  }
+}
+
 void main() {
+  testWidgets('keeps the supplied review URL when editing the label', (
+    tester,
+  ) async {
+    final renderer = _RecordingRenderer();
+    const reviewUrl =
+        'https://search.google.com/local/writereview?placeid=ChIJ_custom';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LabelPreviewScreen(
+          type: QrLabelType.googleReviews,
+          qrData: reviewUrl,
+          renderer: renderer,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(PrintVariant.counterStand.displayName));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Gracias por venir');
+    await tester.pumpAndSettle();
+    expect(renderer.receivedData, [reviewUrl, reviewUrl, reviewUrl]);
+    expect(tester.widget<ExportActions>(find.byType(ExportActions)).url, reviewUrl);
+  });
+
   testWidgets('shows a variant selector, the default text and a preview', (
     tester,
   ) async {
