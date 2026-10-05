@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../domain/google_reviews.dart';
+import '../domain/qr_label_type.dart';
+import 'label_preview_screen.dart';
 
 class GoogleReviewsScreen extends StatefulWidget {
   const GoogleReviewsScreen({super.key});
@@ -77,7 +79,8 @@ class _GoogleReviewsScreenState extends State<GoogleReviewsScreen> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  '¿Tenés un link corto o el nombre del negocio? Abrí el link '
+                  'La mayoría de los links compartidos de Maps, incluso largos, '
+                  'no incluyen el Place ID. Abrí el link '
                   'en Maps, anotá nombre y dirección y buscá ese comercio en '
                   'Place ID Finder de Google. Copiá su ID y pegalo acá. '
                   'No necesitás una clave propia.',
@@ -99,6 +102,18 @@ class _GoogleReviewsScreenState extends State<GoogleReviewsScreen> {
                   ),
                   const SizedBox(height: 12),
                   SelectableText(_reviewUrl!, textAlign: TextAlign.center),
+                  const SizedBox(height: 8),
+                  FilledButton(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => LabelPreviewScreen(
+                          type: QrLabelType.googleReviews,
+                          qrData: _reviewUrl!,
+                        ),
+                      ),
+                    ),
+                    child: const Text('Vista previa de impresión'),
+                  ),
                   const SizedBox(height: 8),
                   const Text(
                     'Escaneá el QR y verificá el negocio antes de imprimir. Google puede pedirte iniciar sesión.',
