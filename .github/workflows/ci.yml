@@ -20,3 +20,11 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      - run: flutter pub get
+        working-directory: prototypes/lpapi_ios
+      - run: flutter analyze
+        working-directory: prototypes/lpapi_ios
+      - run: flutter test
+        working-directory: prototypes/lpapi_ios
+      - run: flutter test --dart-define=LPAPI_SPIKE=true
+        working-directory: prototypes/lpapi_ios

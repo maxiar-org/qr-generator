@@ -12,6 +12,7 @@ class PrinterSession {
       _printer.discoverPrinters().timeout(_timeout);
 
   Future<void> printImage(String address, Uint8List png) async {
+    var operationFailed = false;
     try {
       if (!await _printer.connectPrinter(address).timeout(_timeout)) {
         throw StateError('No se pudo conectar con la impresora.');
@@ -19,8 +20,16 @@ class PrinterSession {
       if (!await _printer.printImage(base64Encode(png)).timeout(_timeout)) {
         throw StateError('La impresora rechazó la imagen.');
       }
+    } catch (_) {
+      operationFailed = true;
+      rethrow;
     } finally {
-      await _printer.disconnectPrinter().timeout(_timeout);
+      try {
+        await _printer.disconnectPrinter().timeout(_timeout);
+      } catch (_) {
+        // Preserve the original operation error and its stack trace.
+        if (!operationFailed) rethrow;
+      }
     }
   }
 }

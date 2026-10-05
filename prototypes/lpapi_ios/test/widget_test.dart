@@ -12,14 +12,19 @@ void main() {
   final calls = <MethodCall>[];
   var connects = true;
   var prints = true;
+  var disconnectFails = false;
 
   setUp(() {
     calls.clear();
     connects = true;
     prints = true;
+    disconnectFails = false;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
           calls.add(call);
+          if (call.method == 'disconnectPrinter' && disconnectFails) {
+            throw PlatformException(code: 'DISCONNECT_FAILED');
+          }
           return switch (call.method) {
             'connectPrinter' => connects,
             'printImage' => prints,
@@ -72,6 +77,42 @@ void main() {
       throwsA(isA<StateError>()),
     );
     expect(calls.last.method, 'disconnectPrinter');
+  });
+
+  for (final failsToConnect in [true, false]) {
+    test('preserves the original error when disconnect also fails '
+        '(connection rejected: $failsToConnect)', () async {
+      connects = !failsToConnect;
+      prints = false;
+      disconnectFails = true;
+      await expectLater(
+        PrinterSession().printImage('DT01', Uint8List(1)),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            failsToConnect
+                ? 'No se pudo conectar con la impresora.'
+                : 'La impresora rechazó la imagen.',
+          ),
+        ),
+      );
+      expect(calls.last.method, 'disconnectPrinter');
+    });
+  }
+
+  test('reports disconnect failure after a successful print', () async {
+    disconnectFails = true;
+    await expectLater(
+      PrinterSession().printImage('DT01', Uint8List(1)),
+      throwsA(
+        isA<PlatformException>().having(
+          (error) => error.code,
+          'code',
+          'DISCONNECT_FAILED',
+        ),
+      ),
+    );
   });
 
   testWidgets('default flag hides printing and makes no Bluetooth calls', (
