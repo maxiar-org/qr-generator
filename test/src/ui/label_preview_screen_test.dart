@@ -7,6 +7,7 @@ import 'package:qr_generator/src/domain/print_variant.dart';
 import 'package:qr_generator/src/domain/qr_label_type.dart';
 import 'package:qr_generator/src/printing/label_image_renderer.dart';
 import 'package:qr_generator/src/ui/label_preview_screen.dart';
+import 'package:qr_generator/src/ui/export_actions.dart';
 
 /// PNG mínimo (1x1) para no depender del motor gráfico real en estos tests;
 /// el contenido exacto del PNG ya está cubierto por label_image_renderer_test.
@@ -63,6 +64,7 @@ void main() {
     await tester.enterText(find.byType(TextField), 'Gracias por venir');
     await tester.pumpAndSettle();
     expect(renderer.receivedData, [reviewUrl, reviewUrl, reviewUrl]);
+    expect(tester.widget<ExportActions>(find.byType(ExportActions)).url, reviewUrl);
   });
 
   testWidgets('shows a variant selector, the default text and a preview', (

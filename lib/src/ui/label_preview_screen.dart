@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../domain/print_variant.dart';
 import '../domain/qr_label_type.dart';
 import '../printing/label_image_renderer.dart';
+import '../export/label_exporter.dart';
+import 'export_actions.dart';
 
 /// Vista previa de la etiqueta a imprimir para un [QrLabelType], con
 /// selector de variante y texto editable.
@@ -29,6 +31,7 @@ class LabelPreviewScreen extends StatefulWidget {
 
 class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
   late final LabelImageRenderer _renderer;
+  late final LabelExporter _exporter;
   late final TextEditingController _textController;
   PrintVariant _variant = PrintVariant.sticker;
   late Future<Uint8List> _imageFuture;
@@ -36,6 +39,7 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
   @override
   void initState() {
     super.initState();
+    _exporter = LabelExporter();
     _renderer = widget.renderer ?? const LabelImageRenderer();
     _textController = TextEditingController(text: widget.type.defaultText);
     _imageFuture = _render();
@@ -108,7 +112,20 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
                         child: Center(child: Text('Generando…')),
                       );
                     }
-                    return Image.memory(bytes, gaplessPlayback: true);
+                    return Column(
+                      children: [
+                        Image.memory(bytes, gaplessPlayback: true),
+                        const SizedBox(height: 16),
+                        ExportActions(
+                          bytes:
+                              snapshot.connectionState == ConnectionState.done
+                              ? bytes
+                              : null,
+                          url: widget.qrData ?? widget.type.sampleQrData,
+                          exporter: _exporter,
+                        ),
+                      ],
+                    );
                   },
                 ),
               ],

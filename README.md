@@ -68,3 +68,49 @@ No se verifica que el perfil exista.
 Los links cortos y las URLs sin ID explícito requieren buscar el comercio
 manualmente en Finder, sin configurar una clave propia.
 Consultá [la comparación de opciones y los pasos de prueba](docs/google-resenas.md).
+
+## Guardar y llevar la etiqueta a WePrint desde el iPhone
+
+1. En la computadora, ejecutá `docker compose up --build`.
+2. Conectá la computadora y el iPhone a la misma red Wi-Fi. Buscá la IP local
+   de la computadora (por ejemplo, `192.168.1.20`; en Linux podés usar `hostname -I`,
+   en macOS `ipconfig getifaddr en0` y en Windows `ipconfig`).
+3. En Safari del iPhone abrí `http://192.168.1.20:8080`, reemplazando la IP por
+   la tuya. `localhost` en el iPhone apunta al teléfono, no a la computadora.
+   Si no carga, revisá que el firewall permita el puerto 8080 y que la red no
+   aísle los dispositivos entre sí.
+4. Elegí un tipo de QR, una variante y el texto. Tocá **Guardar imagen**.
+   Por HTTP local se descarga `etiqueta-qr.png`: abrilo desde **Descargas** de
+   Safari, tocá **Compartir → Guardar imagen** para guardarlo en **Fotos**.
+5. Abrí **WePrint → nueva etiqueta → Imagen → elegí la foto → imprimir**.
+   La pantalla **Cómo imprimir con WePrint** también explica estos pasos.
+
+**Copiar link** copia la misma URL codificada en el QR. Si el navegador no
+permite acceder al portapapeles (incluido HTTP local), aparece el link
+seleccionable: mantenelo presionado para copiarlo manualmente.
+
+### Hoja de compartir directamente desde la app
+
+Safari requiere un contexto seguro (HTTPS) para la Web Share API con archivos.
+En HTTPS, **Guardar imagen** abre la hoja de compartir cuando el navegador
+admite PNG; elegí **Guardar imagen** para llevarlo a Fotos. Si compartir no
+está disponible o falla, se intenta descargar el PNG. Cancelar la hoja no
+inicia una descarga.
+
+Para probar este recorrido con el mismo contenedor, exponé el puerto 8080
+mediante un proxy HTTPS con certificado confiable para el iPhone. Una opción,
+si tenés `cloudflared` instalado, es:
+
+```sh
+cloudflared tunnel --url http://localhost:8080
+```
+
+Abrí en Safari la URL `https://…trycloudflare.com` que imprime el comando;
+el túnel publica temporalmente la app en Internet y necesita conexión.
+Cerralo con Ctrl+C al terminar. Para mantener todo en la red local, usá un
+proxy HTTPS local con un certificado que el iPhone tenga instalado y marcado
+como confiable; aceptar solamente una advertencia de certificado no basta.
+
+Referencia: [requisitos de Web Share](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share).
+La exportación nativa de iOS queda para una etapa posterior; este flujo se
+implementa para la app web. No imprime por Bluetooth desde el generador.
