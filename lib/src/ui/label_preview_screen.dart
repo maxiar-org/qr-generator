@@ -14,12 +14,12 @@ class LabelPreviewScreen extends StatefulWidget {
   const LabelPreviewScreen({
     super.key,
     required this.type,
+    required this.qrData,
     this.renderer,
-    this.qrData,
   });
 
   final QrLabelType type;
-  final String? qrData;
+  final String qrData;
 
   /// Permite reemplazar el renderer en los tests por uno sin dependencias
   /// del motor gráfico real.
@@ -52,7 +52,7 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
   }
 
   Future<Uint8List> _render() => _renderer.render(
-    qrData: widget.qrData ?? widget.type.sampleQrData,
+    qrData: widget.qrData,
     type: widget.type,
     variant: _variant,
     text: _textController.text,
@@ -121,7 +121,7 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
                               snapshot.connectionState == ConnectionState.done
                               ? bytes
                               : null,
-                          url: widget.qrData ?? widget.type.sampleQrData,
+                          url: widget.qrData,
                           exporter: _exporter,
                         ),
                       ],

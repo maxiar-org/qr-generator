@@ -23,7 +23,7 @@ void main() {
       late Uint8List bytes;
       await tester.runAsync(() async {
         bytes = await renderer.render(
-          qrData: QrLabelType.whatsapp.sampleQrData,
+          qrData: 'https://wa.me/5491122334455',
           type: QrLabelType.whatsapp,
           variant: variant,
           text: QrLabelType.whatsapp.defaultText,
@@ -39,7 +39,7 @@ void main() {
   testWidgets('only produces pure black or pure white pixels', (tester) async {
     await tester.runAsync(() async {
       final bytes = await renderer.render(
-        qrData: QrLabelType.instagram.sampleQrData,
+        qrData: 'https://instagram.com/tu_negocio',
         type: QrLabelType.instagram,
         variant: PrintVariant.sticker,
         text: QrLabelType.instagram.defaultText,
@@ -78,7 +78,7 @@ void main() {
       tester,
     ) async {
       const type = QrLabelType.whatsapp;
-      final qrData = type.sampleQrData;
+      final qrData = 'https://wa.me/5491122334455';
       late Uint8List pixels;
       late int imageWidth;
       await tester.runAsync(() async {

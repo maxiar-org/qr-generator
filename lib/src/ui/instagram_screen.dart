@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../domain/instagram_profile.dart';
+import '../domain/qr_label_type.dart';
+import 'label_preview_screen.dart';
 
 class InstagramScreen extends StatefulWidget {
   const InstagramScreen({super.key});
@@ -12,22 +13,21 @@ class InstagramScreen extends StatefulWidget {
 
 class _InstagramScreenState extends State<InstagramScreen> {
   final _controller = TextEditingController();
-  String? _profileUrl;
   String? _error;
 
   void _generate() {
+    FocusScope.of(context).unfocus();
     try {
       final url = normalizeInstagramProfile(_controller.text);
-      setState(() {
-        _profileUrl = url;
-        _error = null;
-      });
-      FocusScope.of(context).unfocus();
+      setState(() => _error = null);
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) =>
+              LabelPreviewScreen(type: QrLabelType.instagram, qrData: url),
+        ),
+      );
     } on FormatException catch (error) {
-      setState(() {
-        _profileUrl = null;
-        _error = error.message;
-      });
+      setState(() => _error = error.message);
     }
   }
 
@@ -66,35 +66,14 @@ class _InstagramScreenState extends State<InstagramScreen> {
                   ),
                   onSubmitted: (_) => _generate(),
                   onChanged: (_) => setState(() {
-                    _profileUrl = null;
                     _error = null;
                   }),
                 ),
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: _generate,
-                  child: const Text('Generar QR'),
+                  child: const Text('Ver etiqueta'),
                 ),
-                if (_profileUrl != null) ...[
-                  const SizedBox(height: 24),
-                  Center(
-                    child: QrImageView(
-                      data: _profileUrl!,
-                      size: 280,
-                      padding: const EdgeInsets.all(28),
-                      backgroundColor: Colors.white,
-                      semanticsLabel:
-                          'QR del perfil de Instagram: $_profileUrl',
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SelectableText(_profileUrl!, textAlign: TextAlign.center),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Escaneá el QR para abrir el perfil.',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
               ],
             ),
           ),

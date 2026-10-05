@@ -74,6 +74,7 @@ void main() {
       const MaterialApp(
         home: LabelPreviewScreen(
           type: QrLabelType.whatsapp,
+          qrData: 'https://instagram.com/comercio',
           renderer: _FakeRenderer(),
         ),
       ),
@@ -93,6 +94,7 @@ void main() {
       const MaterialApp(
         home: LabelPreviewScreen(
           type: QrLabelType.instagram,
+          qrData: 'https://instagram.com/comercio',
           renderer: _FakeRenderer(),
         ),
       ),
@@ -112,6 +114,7 @@ void main() {
       const MaterialApp(
         home: LabelPreviewScreen(
           type: QrLabelType.googleReviews,
+          qrData: 'https://instagram.com/comercio',
           renderer: _FakeRenderer(),
         ),
       ),
