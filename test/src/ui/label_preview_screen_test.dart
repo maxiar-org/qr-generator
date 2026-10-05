@@ -34,6 +34,7 @@ void main() {
       const MaterialApp(
         home: LabelPreviewScreen(
           type: QrLabelType.whatsapp,
+          qrData: 'https://instagram.com/comercio',
           renderer: _FakeRenderer(),
         ),
       ),
@@ -48,13 +49,12 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
   });
 
-  testWidgets('switching the variant keeps showing a preview', (
-    tester,
-  ) async {
+  testWidgets('switching the variant keeps showing a preview', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: LabelPreviewScreen(
           type: QrLabelType.instagram,
+          qrData: 'https://instagram.com/comercio',
           renderer: _FakeRenderer(),
         ),
       ),
@@ -74,6 +74,7 @@ void main() {
       const MaterialApp(
         home: LabelPreviewScreen(
           type: QrLabelType.googleReviews,
+          qrData: 'https://instagram.com/comercio',
           renderer: _FakeRenderer(),
         ),
       ),

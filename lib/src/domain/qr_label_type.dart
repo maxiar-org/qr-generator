@@ -16,13 +16,4 @@ extension QrLabelTypeDetails on QrLabelType {
     QrLabelType.googleReviews => '¡Dejanos tu reseña!',
     QrLabelType.mercadoPago => '¡Pagá con Mercado Pago!',
   };
-
-  /// Dato de ejemplo para previsualizar el QR mientras no exista el flujo
-  /// real de cada tipo (ver issues #2, #3, #6 y #7).
-  String get sampleQrData => switch (this) {
-    QrLabelType.whatsapp => 'https://wa.me/5491122334455',
-    QrLabelType.instagram => 'https://instagram.com/tu_negocio',
-    QrLabelType.googleReviews => 'https://g.page/r/example/review',
-    QrLabelType.mercadoPago => 'https://link.mercadopago.com.ar/example',
-  };
 }
