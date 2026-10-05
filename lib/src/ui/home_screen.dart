@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../domain/qr_label_type.dart';
-import 'label_preview_screen.dart';
+import 'coming_soon_screen.dart';
+import 'instagram_screen.dart';
+import 'whatsapp_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -24,7 +26,11 @@ class HomeScreen extends StatelessWidget {
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
-                          builder: (_) => LabelPreviewScreen(type: type),
+                          builder: (_) => switch (type) {
+                            QrLabelType.whatsapp => const WhatsAppScreen(),
+                            QrLabelType.instagram => const InstagramScreen(),
+                            _ => ComingSoonScreen(type: type),
+                          },
                         ),
                       ),
                     ),

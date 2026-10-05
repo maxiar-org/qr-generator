@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../domain/whatsapp.dart';
+import '../domain/qr_label_type.dart';
+import 'label_preview_screen.dart';
 
 class WhatsAppScreen extends StatefulWidget {
   const WhatsAppScreen({super.key});
@@ -13,7 +14,6 @@ class WhatsAppScreen extends StatefulWidget {
 class _WhatsAppScreenState extends State<WhatsAppScreen> {
   final _phone = TextEditingController();
   final _message = TextEditingController();
-  String? _url;
   String? _error;
 
   @override
@@ -25,22 +25,24 @@ class _WhatsAppScreenState extends State<WhatsAppScreen> {
 
   void _clearResult(String _) {
     setState(() {
-      _url = null;
       _error = null;
     });
   }
 
   void _generate() {
     FocusScope.of(context).unfocus();
-    setState(() {
-      _url = null;
-      _error = null;
-      try {
-        _url = buildWhatsAppUrl(_phone.text, message: _message.text);
-      } on FormatException catch (error) {
-        _error = error.message;
-      }
-    });
+    try {
+      final url = buildWhatsAppUrl(_phone.text, message: _message.text);
+      setState(() => _error = null);
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) =>
+              LabelPreviewScreen(type: QrLabelType.whatsapp, qrData: url),
+        ),
+      );
+    } on FormatException catch (error) {
+      setState(() => _error = error.message);
+    }
   }
 
   @override
@@ -86,25 +88,8 @@ class _WhatsAppScreenState extends State<WhatsAppScreen> {
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: _generate,
-                  child: const Text('Generar QR'),
+                  child: const Text('Ver etiqueta'),
                 ),
-                if (_url != null) ...[
-                  const SizedBox(height: 24),
-                  const Text('Escaneá el QR para abrir el chat en WhatsApp.'),
-                  Center(
-                    child: QrImageView(
-                      data: _url!,
-                      size: 280,
-                      padding: const EdgeInsets.all(20),
-                      backgroundColor: Colors.white,
-                      semanticsLabel: 'QR para abrir el chat en WhatsApp',
-                      errorStateBuilder: (_, _) => const Text(
-                        'El mensaje es demasiado largo. Acortalo y volvé a generar el QR.',
-                      ),
-                    ),
-                  ),
-                  SelectableText(_url!),
-                ],
               ],
             ),
           ),
