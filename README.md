@@ -114,3 +114,5 @@ como confiable; aceptar solamente una advertencia de certificado no basta.
 Referencia: [requisitos de Web Share](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share).
 La exportación nativa de iOS queda para una etapa posterior; este flujo se
 implementa para la app web. No imprime por Bluetooth desde el generador.
+
+<!-- prueba de preview de Coolify -->
