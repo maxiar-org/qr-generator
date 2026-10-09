@@ -1,0 +1,37 @@
+[
+  {
+    "path": "places/nearby",
+    "body": {
+      "languageCode": "es",
+      "maxResultCount": 20,
+      "rankPreference": "DISTANCE",
+      "locationRestriction": {
+        "circle": {
+          "center": {
+            "latitude": -34.6037,
+            "longitude": -58.3816
+          },
+          "radius": 200
+        }
+      }
+    }
+  },
+  {
+    "path": "places/search",
+    "body": {
+      "textQuery": "Café del Centro Buenos Aires",
+      "languageCode": "es",
+      "regionCode": "AR",
+      "pageSize": 20
+    }
+  },
+  {
+    "path": "places/search",
+    "body": {
+      "textQuery": "Café del Centro Buenos Aires",
+      "languageCode": "es",
+      "regionCode": "AR",
+      "pageSize": 20
+    }
+  }
+]

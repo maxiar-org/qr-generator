@@ -60,3 +60,13 @@ El QR contiene `https://search.google.com/local/writereview?placeid=<PLACE_ID>` 
 - [Tarifas globales][3]
 - [Configuración de Places API][4]
 - [Reseñas en el Perfil de Empresa][5]
+
+## Buscar el negocio automáticamente
+
+Usá **Buscar cerca mío**, habilitá la ubicación del navegador y elegí el negocio
+por nombre y dirección. Si no aparece o el permiso falla, abrí **Buscar por nombre**
+e ingresá también la localidad. La selección abre la etiqueta lista para imprimir.
+El ingreso manual de Place ID sigue disponible debajo de la búsqueda.
+
+La búsqueda requiere configurar el proxy de Places API (New); sin clave se muestra
+un aviso y se puede continuar manualmente. Ver [configuración, costos y capturas](places-api-costos.md).
