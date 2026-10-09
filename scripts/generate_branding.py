@@ -1,4 +1,4 @@
-"""Rasterize the canonical SVG. Run from any directory with CairoSVG 2.9.0."""
+"""Rasterize the canonical SVG. Run from any directory with CairoSVG 2.9.1."""
 
 from pathlib import Path
 import xml.etree.ElementTree as ET
