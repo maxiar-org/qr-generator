@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../export/label_exporter.dart';
+import 'theme/app_theme.dart';
 import 'weprint_help_screen.dart';
 
 class ExportActions extends StatefulWidget {
@@ -76,13 +77,26 @@ class _ExportActionsState extends State<ExportActions> {
         icon: const Icon(Icons.save_alt),
         label: const Text('Guardar imagen'),
       ),
+      const SizedBox(height: AppSpacing.sm),
       OutlinedButton.icon(
         onPressed: _copy,
         icon: const Icon(Icons.copy),
         label: const Text('Copiar link'),
       ),
-      if (_message != null) Text(_message!, semanticsLabel: _message),
-      if (_showLink) SelectableText(widget.url),
+      if (_message != null) ...[
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          _message!,
+          semanticsLabel: _message,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
+      if (_showLink) ...[
+        const SizedBox(height: AppSpacing.xs),
+        SelectableText(widget.url, textAlign: TextAlign.center),
+      ],
+      const SizedBox(height: AppSpacing.sm),
       TextButton(
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute<void>(builder: (_) => const WePrintHelpScreen()),
