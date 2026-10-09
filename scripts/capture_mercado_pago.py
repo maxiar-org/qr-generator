@@ -30,7 +30,7 @@ with sync_playwright() as p:
     page.get_by_role("button", name="Guardar imagen", exact=True).wait_for()
     shot("03-etiqueta.png")
     for variant, height in [("Adhesivo",464), ("Mostrador",640), ("Tarjetero",560)]:
-        page.get_by_role("radio", name=variant, exact=False).click()
+        page.get_by_role("button", name=variant, exact=True).click()
         page.wait_for_timeout(600)
         with page.expect_download() as download:
             page.get_by_role("button", name="Guardar imagen", exact=True).click()
@@ -45,11 +45,11 @@ with sync_playwright() as p:
     home()
     page.get_by_text("Mercado Pago", exact=True).click()
     upload("unrelated")
-    page.get_by_text("No reconocemos", exact=False).wait_for()
+    page.locator("flt-semantics span").filter(has_text="No reconocemos").wait_for()
     shot("04-qr-ajeno.png")
     assert page.get_by_role("button", name="Confirmar y ver etiqueta").count() == 0
     upload("emv")
-    page.get_by_text("estructura EMVCo", exact=False).wait_for()
+    page.locator("flt-semantics span").filter(has_text="estructura EMVCo").wait_for()
     shot("05-emvco.png")
     page.get_by_role("button", name="Confirmar y ver etiqueta").click()
     page.wait_for_timeout(1000)
@@ -64,9 +64,9 @@ with sync_playwright() as p:
     assert page.evaluate("window.decoded") == (ROOT / "test/fixtures/mercado_pago/emv.txt").read_text()
     home()
     page.get_by_text("Mercado Pago", exact=True).click()
-    page.evaluate("""navigator.mediaDevices.getUserMedia = async () => {
+    page.evaluate("""() => { navigator.mediaDevices.getUserMedia = async () => {
         throw new DOMException('Denied', 'NotAllowedError');
-    }""")
+    }; }""")
     page.get_by_role("button", name="Escanear QR del comercio").click()
     page.get_by_text("No pudimos abrir la cámara.", exact=False).wait_for()
     shot("06-permiso-denegado.png")

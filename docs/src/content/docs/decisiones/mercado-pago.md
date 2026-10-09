@@ -6,9 +6,11 @@ sidebar:
 ---
 
 :::note
-Este QR todavía **no está implementado** en la app: la pantalla de Mercado
-Pago muestra "Próximamente". Lo que sigue es un resumen de la investigación
-de opciones, no de una funcionalidad disponible.
+El issue #20 implementa la decisión de Eduardo: escanear el QR que ya tiene
+el comercio, o cargar una foto, confirmar el contenido y regenerar la etiqueta.
+La validación reconoce el formato; no verifica titular ni vigencia del cobro.
+La prueba física en iPhone y DT01 sigue pendiente. Ver el
+[recorrido y las capturas](https://github.com/maxiar-org/qr-generator/tree/agent/20-mercado-pago-escanear-con-la-camara-el-q/docs/evidence/issue-20).
 :::
 
 **Opciones comparadas:** transferencia por alias/CVU, link de pago de
@@ -26,10 +28,8 @@ cuenta, no una orden de cobro — no hay garantía de que un QR con ese texto se
 pueda pagar desde el lector de cualquier billetera. El QR comercial lo emite
 un aceptador (Mercado Pago u otro), no se puede derivar solo del alias.
 
-**Pendiente antes de implementar:** confirmar con Eduardo si se prioriza
-pagar sin comisión (alias/CVU, transferencia manual) o cobrar con QR
-interoperable (con comisión, pero funciona desde más apps), y conseguir un
-comercio piloto para probar el circuito completo.
+**Pendiente para el piloto:** probar el circuito completo con el QR vigente
+de un comercio, desde Safari en iPhone hasta la impresión y lectura del papel.
 
 **Documento completo:** [`docs/mercado-pago.md`](https://github.com/maxiar-org/qr-generator/blob/main/docs/mercado-pago.md) —
 incluye la tabla comparativa completa, tarifas de cada opción, las preguntas
