@@ -16,5 +16,10 @@ COPY . .
 RUN flutter build web --release
 
 FROM nginx:stable-alpine AS runtime
+ENV GOOGLE_PLACES_API_KEY=""
+ENV NGINX_ENVSUBST_FILTER=GOOGLE_PLACES_API_KEY
+ENV NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+COPY nginx/default.conf.template /etc/nginx/templates/conf.d/default.conf.template
+COPY nginx/places-proxy.conf.template /etc/nginx/templates/places-proxy.conf.template
 COPY --from=build /app/build/web /usr/share/nginx/html
 EXPOSE 80
