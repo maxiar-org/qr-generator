@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="#0F4C5C">
+  <title>Generador de QR</title>
+  <desc>Tres módulos cuadrados y una etiqueta diagonal.</desc>
+  <rect x="8" y="8" width="22" height="22" rx="3"/>
+  <rect x="34" y="8" width="22" height="22" rx="3"/>
+  <rect x="8" y="34" width="22" height="22" rx="3"/>
+  <rect x="32" y="39" width="26" height="12" rx="2" transform="rotate(-45 45 45)"/>
+</svg>
