@@ -4,6 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_generator/src/domain/payment_qr.dart';
 
 void main() {
+  test('rejects payloads exceeding the renderer byte capacity', () {
+    for (final suffix in ['a' * 2400, 'é' * 1200]) {
+      expect(
+        validatePaymentQr('https://mpago.la/$suffix').recognized,
+        isFalse,
+      );
+    }
+  });
   test('recognizes synthetic Argentine interoperable fixture', () {
     final data = File('test/fixtures/mercado_pago/interoperable.txt')
         .readAsStringSync();

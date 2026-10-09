@@ -14,7 +14,8 @@ PaymentQrValidation validatePaymentQr(String data) {
     'No reconocemos un QR de Mercado Pago ni un QR interoperable argentino. '
     'Pedile al comercio su QR de cobro y volvé a escanearlo.',
   );
-  if (data.length > 2900 || data.trim() != data) return unknown;
+  // The label renderer uses byte mode with M correction (2331 bytes max).
+  if (utf8.encode(data).length > 2331 || data.trim() != data) return unknown;
   final uri = Uri.tryParse(data);
   if (uri != null &&
       uri.scheme == 'https' &&
