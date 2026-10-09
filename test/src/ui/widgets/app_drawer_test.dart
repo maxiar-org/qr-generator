@@ -1,4 +1,7 @@
+import 'dart:ui' show Tristate;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_generator/src/ui/widgets/app_drawer.dart';
 import 'package:qr_generator/src/ui/whatsapp_screen.dart';
@@ -58,5 +61,36 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(AppDrawer), findsNothing);
     expect(find.byType(WhatsAppScreen), findsOneWidget);
+  });
+
+  testWidgets('marks the current type as selected for screen readers', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(const MaterialApp(home: WhatsAppScreen()));
+    await tester.tap(find.byTooltip('Menú de tipos de QR'));
+    await tester.pumpAndSettle();
+
+    SemanticsNode tileFor(String label) => tester.getSemantics(
+      find.ancestor(
+        of: find.descendant(
+          of: find.byType(AppDrawer),
+          matching: find.text(label),
+        ),
+        matching: find.byType(ListTile),
+      ),
+    );
+
+    expect(
+      tileFor('WhatsApp').getSemanticsData().flagsCollection.isSelected,
+      Tristate.isTrue,
+      reason: 'WhatsApp es la pantalla actual: debe anunciarse seleccionado',
+    );
+    expect(
+      tileFor('Instagram').getSemanticsData().flagsCollection.isSelected,
+      Tristate.isFalse,
+    );
+
+    handle.dispose();
   });
 }

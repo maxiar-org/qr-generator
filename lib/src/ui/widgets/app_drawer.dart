@@ -50,6 +50,12 @@ class _DrawerTile extends StatelessWidget {
         color: selected ? AppColors.surface : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadius.md),
         child: ListTile(
+          selected: selected,
+          // El color de selección ya lo da el fondo Superficie + borde de
+          // arriba; se fija acá para que `selected` sólo aporte semántica
+          // (lector de pantalla) sin que Material tiña el texto/ícono con
+          // el color primario por defecto.
+          selectedColor: AppColors.ink,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.md),
             side: BorderSide(
