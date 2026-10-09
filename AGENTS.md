@@ -28,6 +28,14 @@ Abre `http://localhost:8765`, espera unos 5 segundos a que cargue Flutter y reco
 - **WhatsApp:** inicio → WhatsApp → ingresar el número → ver la etiqueta con el QR real → guardar o copiar.
 - **Instagram:** inicio → Instagram → ingresar el usuario → ver la etiqueta con el QR real → guardar o copiar.
 
+## Skills
+- Las skills del proyecto viven en **`.agents/skills/`** (ruta genérica: Codex la lee directo). `.claude/skills` es un enlace simbólico a esa carpeta, para que Claude vea las mismas.
+- **Diseño de UI:** usá `frontend-design` (dirección estética, tipografía, color) e `impeccable` (vocabulario y comandos de diseño: `init`, `critique`, `audit`, `typeset`, `polish`…).
+  - Las dos están pensadas para web. En Flutter, aplicá sus criterios al `ThemeData`, los widgets y los tokens de diseño.
+  - De `impeccable`, preferí las referencias `*.native.md` cuando existan. Su detector automático analiza HTML/CSS y puede no servir sobre una app Flutter: si no aplica, decilo en el PR.
+  - Su contexto de diseño (`PRODUCT.md` y `DESIGN.md` en la raíz) es parte del entregable cuando se lo pida el issue.
+- **No instales, actualices ni modifiques skills** (`.agents/skills/`, `.claude/`) desde un issue: las agregan Eduardo o Claude Code con un PR revisado.
+
 ## Prohibido
 - Push directo a `main`, mergear PRs, o agregar secretos o claves de API al repo.
 

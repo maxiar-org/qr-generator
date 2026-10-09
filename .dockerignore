@@ -8,3 +8,7 @@ ios
 test
 *.iml
 *.log
+
+# Skills de agentes (no van a la imagen)
+.agents
+.claude

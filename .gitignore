@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Skills de agentes: el motor de impeccable se descarga en el primer uso (verificado con SHA-256)
+.agents/skills/impeccable/scripts/bin/
