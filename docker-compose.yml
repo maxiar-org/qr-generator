@@ -1,5 +1,7 @@
 services:
   web:
     build: .
+    environment:
+      GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:-}
     ports:
       - "8080:80"
