@@ -46,7 +46,8 @@ class _GoogleReviewsScreenState extends State<GoogleReviewsScreen> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return AppScreen(
-      title: 'Google Reseñas',
+      screenTitle: 'Google Reseñas',
+      currentType: QrLabelType.googleReviews,
       children: [
         BusinessSearch(
           onSelected: (place) {

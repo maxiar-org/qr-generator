@@ -22,6 +22,7 @@
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Generador de QR">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
@@ -33,8 +34,59 @@
 
   <title>Generador de QR</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Pantalla de carga: paleta de DESIGN.md (Papel/Sello), nunca blanco
+       liso, mientras el motor de Flutter arranca. Se desvanece sola al
+       recibir "flutter-first-frame" más abajo. */
+    html, body {
+      background: #F7F6F2;
+    }
+    #splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: #F7F6F2;
+      transition: opacity 0.25s ease-out;
+    }
+    #splash svg {
+      width: 64px;
+      height: 64px;
+      animation: splash-pulse 1.1s ease-in-out infinite;
+    }
+    #splash.splash-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    @keyframes splash-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+  </style>
 </head>
 <body>
+  <div id="splash" role="presentation">
+    <svg viewBox="0 0 64 64" fill="#0F4C5C" aria-hidden="true">
+      <rect x="8" y="8" width="22" height="22" rx="3"/>
+      <rect x="34" y="8" width="22" height="22" rx="3"/>
+      <rect x="8" y="34" width="22" height="22" rx="3"/>
+      <rect x="32" y="39" width="26" height="12" rx="2" transform="rotate(-45 45 45)"/>
+    </svg>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('splash');
+      if (!splash) return;
+      splash.classList.add('splash-hidden');
+      splash.addEventListener('transitionend', function () {
+        splash.remove();
+      }, { once: true });
+    });
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

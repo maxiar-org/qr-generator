@@ -42,7 +42,8 @@ class _InstagramScreenState extends State<InstagramScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScreen(
-      title: 'Instagram',
+      screenTitle: 'Instagram',
+      currentType: QrLabelType.instagram,
       children: [
         const Text(
           'Ingresá el usuario o pegá el enlace al perfil de tu comercio.',

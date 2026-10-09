@@ -7,7 +7,7 @@ class WePrintHelpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppScreen(
-    title: 'Cómo imprimir con WePrint',
+    screenTitle: 'Cómo imprimir con WePrint',
     children: const [
       ListTile(
         title: Text('1. Guardá la imagen'),

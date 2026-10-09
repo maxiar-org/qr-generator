@@ -68,7 +68,8 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
   Widget build(BuildContext context) {
     final size = printVariantSizes[_variant]!;
     return AppScreen(
-      title: widget.type.displayName,
+      screenTitle: widget.type.displayName,
+      currentType: widget.type,
       children: [
         SegmentedButton<PrintVariant>(
           segments: [

@@ -81,7 +81,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(AppBar, 'WhatsApp'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Generador de QR'), findsOneWidget);
+    expect(find.text('WhatsApp'), findsOneWidget);
     for (final variant in PrintVariant.values) {
       expect(find.text(variant.displayName), findsOneWidget);
     }
