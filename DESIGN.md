@@ -195,7 +195,15 @@ en vez de usar sombra.
 - **Error:** borde y texto de ayuda en color Error, ícono de alerta antes del mensaje cuando el error no cuelga de un campo (ej. "No pudimos obtener tu ubicación…").
 
 ### Navigation
-- **AppBar:** fondo Papel (no un color de marca sólido, para no competir con el contenido), título en estilo Display, flecha "Atrás" en Tinta.
+- **Cabecera de marca:** el `AppBar` de toda pantalla muestra el mismo título fijo — logo (24dp, Sello) + "Generador de QR" en estilo Display — en vez del nombre de la sección; fondo Papel (no un color de marca sólido, para no competir con el contenido). Cuando hay una pantalla anterior en el stack, Flutter agrega la flecha "Atrás" en Tinta automáticamente a la izquierda (comportamiento nativo de `Scaffold`, no hay que gestionarlo a mano); a la derecha, un botón de menú (`Icons.menu`) abre el menú lateral. El nombre de la sección actual (ej. "WhatsApp") se muestra como encabezado estilo Headline al principio del cuerpo en vez de en el AppBar — ver `AppScreen.screenTitle`.
+- **Menú lateral (`endDrawer`):** lista los cuatro tipos de QR con el mismo ícono y acento de color que la lista de Inicio, para reconocerlos de un vistazo también desde el menú. El tipo de la pantalla actual se resalta con fondo Superficie y borde Borde (mismo tratamiento que una `Card`, sin sombra ni color de selección de Material por defecto). Elegir un tipo reemplaza el stack de navegación hasta Inicio y abre esa pantalla ahí arriba, para que "Atrás" siempre vuelva a Inicio sin importar desde qué pantalla se abrió el menú.
+
+### Logo
+`assets/branding/logo.svg` (tres módulos cuadrados + etiqueta diagonal, ver `assets/branding/README.md`) se redibuja en Flutter con un `CustomPainter` (`AppLogo`/`AppLogoPainter`) que replica la misma geometría en vez de cargar el SVG o un PNG como asset: evita una dependencia nueva y mantiene nítido el trazo a cualquier tamaño. Se usa a 24dp en la cabecera y el menú lateral, siempre en Sello sobre Papel/Superficie — nunca sobre el acento Marigold ni en blanco.
+
+### Splash (`web/index.html`)
+- Pantalla de carga fuera del árbol de Flutter (HTML/CSS puro en `web/index.html`): es lo único que se ve antes de que el motor pinte el primer frame, así que no puede depender de Dart. Fondo Papel (`#F7F6F2`) a pantalla completa con el logo (`#0F4C5C`, misma geometría que `assets/branding/logo.svg`) centrado y una animación de pulso sutil — nunca el blanco vacío por defecto de una PWA sin configurar.
+- Se desvanece con un `fade` de 0.25s al recibir el evento `flutter-first-frame` del propio engine de Flutter web, y se remueve del DOM al terminar la transición — la pantalla de Inicio ya está pintada debajo cuando eso pasa.
 
 ## Do's and Don'ts
 
