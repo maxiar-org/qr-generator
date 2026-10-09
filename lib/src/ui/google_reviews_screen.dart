@@ -4,6 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../domain/google_reviews.dart';
 import '../domain/qr_label_type.dart';
 import 'label_preview_screen.dart';
+import 'business_search.dart';
 
 class GoogleReviewsScreen extends StatefulWidget {
   const GoogleReviewsScreen({super.key});
@@ -50,6 +51,18 @@ class _GoogleReviewsScreenState extends State<GoogleReviewsScreen> {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
+                BusinessSearch(
+                  onSelected: (place) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => LabelPreviewScreen(
+                          type: QrLabelType.googleReviews,
+                          qrData: place.reviewUrl,
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 const Text(
                   'Pegá el Place ID o una URL de Maps con query_place_id.',
                 ),
