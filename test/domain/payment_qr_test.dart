@@ -1,7 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_generator/src/domain/payment_qr.dart';
 
 void main() {
+  test('recognizes synthetic Argentine interoperable fixture', () {
+    final data = File('test/fixtures/mercado_pago/interoperable.txt')
+        .readAsStringSync();
+    expect(validatePaymentQr(data).recognized, isTrue);
+    expect(
+      validatePaymentQr(data).message,
+      contains('Formato interoperable argentino'),
+    );
+  });
+  test('malformed inputs never throw', () {
+    for (var length = 0; length < 300; length++) {
+      expect(validatePaymentQr('0' * length).recognized, isFalse);
+    }
+  });
   test('recognizes exact Mercado Pago HTTPS hosts and preserves payload', () {
     for (final value in [
       'https://mpago.la/pos/demo',

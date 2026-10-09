@@ -123,6 +123,7 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
                       : null,
                   url: widget.qrData,
                   exporter: _exporter,
+                  isPaymentPayload: widget.type == QrLabelType.mercadoPago,
                 ),
               ],
             );
