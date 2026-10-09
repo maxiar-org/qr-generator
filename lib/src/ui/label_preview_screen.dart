@@ -7,6 +7,8 @@ import '../domain/qr_label_type.dart';
 import '../printing/label_image_renderer.dart';
 import '../export/label_exporter.dart';
 import 'export_actions.dart';
+import 'theme/app_theme.dart';
+import 'widgets/app_screen.dart';
 
 /// Vista previa de la etiqueta a imprimir para un [QrLabelType], con
 /// selector de variante y texto editable.
@@ -65,74 +67,67 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     final size = printVariantSizes[_variant]!;
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.type.displayName)),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: ListView(
-              padding: const EdgeInsets.all(16),
+    return AppScreen(
+      title: widget.type.displayName,
+      children: [
+        SegmentedButton<PrintVariant>(
+          segments: [
+            for (final variant in PrintVariant.values)
+              ButtonSegment(value: variant, label: Text(variant.displayName)),
+          ],
+          selected: {_variant},
+          onSelectionChanged: (selection) {
+            _variant = selection.first;
+            _refresh();
+          },
+        ),
+        const SizedBox(height: AppSpacing.md),
+        TextField(
+          controller: _textController,
+          decoration: const InputDecoration(labelText: 'Texto de la etiqueta'),
+          onChanged: (_) => _refresh(),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          '${size.width} x ${size.height} px',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        FutureBuilder<Uint8List>(
+          future: _imageFuture,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+            final bytes = snapshot.data;
+            if (bytes == null) {
+              return const Padding(
+                padding: EdgeInsets.all(AppSpacing.xl),
+                child: Center(child: Text('Generando…')),
+              );
+            }
+            return Column(
               children: [
-                SegmentedButton<PrintVariant>(
-                  segments: [
-                    for (final variant in PrintVariant.values)
-                      ButtonSegment(
-                        value: variant,
-                        label: Text(variant.displayName),
-                      ),
-                  ],
-                  selected: {_variant},
-                  onSelectionChanged: (selection) {
-                    _variant = selection.first;
-                    _refresh();
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _textController,
-                  decoration: const InputDecoration(
-                    labelText: 'Texto de la etiqueta',
+                Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    child: Image.memory(bytes, gaplessPlayback: true),
                   ),
-                  onChanged: (_) => _refresh(),
                 ),
-                const SizedBox(height: 16),
-                Text('${size.width} x ${size.height} px'),
-                const SizedBox(height: 8),
-                FutureBuilder<Uint8List>(
-                  future: _imageFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    }
-                    final bytes = snapshot.data;
-                    if (bytes == null) {
-                      return const Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Center(child: Text('Generando…')),
-                      );
-                    }
-                    return Column(
-                      children: [
-                        Image.memory(bytes, gaplessPlayback: true),
-                        const SizedBox(height: 16),
-                        ExportActions(
-                          bytes:
-                              snapshot.connectionState == ConnectionState.done
-                              ? bytes
-                              : null,
-                          url: widget.qrData,
-                          exporter: _exporter,
-                        ),
-                      ],
-                    );
-                  },
+                const SizedBox(height: AppSpacing.md),
+                ExportActions(
+                  bytes: snapshot.connectionState == ConnectionState.done
+                      ? bytes
+                      : null,
+                  url: widget.qrData,
+                  exporter: _exporter,
                 ),
               ],
-            ),
-          ),
+            );
+          },
         ),
-      ),
+      ],
     );
   }
 }
