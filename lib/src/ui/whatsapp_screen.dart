@@ -50,7 +50,8 @@ class _WhatsAppScreenState extends State<WhatsAppScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScreen(
-      title: 'WhatsApp',
+      screenTitle: 'WhatsApp',
+      currentType: QrLabelType.whatsapp,
       children: [
         const Text('Ingresá el celular de tu comercio con código de área.'),
         const SizedBox(height: AppSpacing.md),

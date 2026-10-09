@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../domain/qr_label_type.dart';
 import '../printing/label_icons.dart';
-import 'coming_soon_screen.dart';
-import 'google_reviews_screen.dart';
-import 'instagram_screen.dart';
 import 'theme/app_theme.dart';
-import 'whatsapp_screen.dart';
 import 'widgets/app_screen.dart';
+import 'widgets/qr_type_navigation.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -16,7 +13,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return AppScreen(
-      title: 'Generador de QR',
       children: [
         for (final type in QrLabelType.values) ...[
           Card(
@@ -38,12 +34,7 @@ class HomeScreen extends StatelessWidget {
               ),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (_) => switch (type) {
-                    QrLabelType.googleReviews => const GoogleReviewsScreen(),
-                    QrLabelType.whatsapp => const WhatsAppScreen(),
-                    QrLabelType.instagram => const InstagramScreen(),
-                    _ => ComingSoonScreen(type: type),
-                  },
+                  builder: (_) => screenForQrType(type),
                 ),
               ),
             ),
