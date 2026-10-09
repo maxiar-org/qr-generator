@@ -71,16 +71,32 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
       screenTitle: widget.type.displayName,
       currentType: widget.type,
       children: [
-        SegmentedButton<PrintVariant>(
-          segments: [
-            for (final variant in PrintVariant.values)
-              ButtonSegment(value: variant, label: Text(variant.displayName)),
-          ],
-          selected: {_variant},
-          onSelectionChanged: (selection) {
-            _variant = selection.first;
-            _refresh();
-          },
+        LayoutBuilder(
+          builder: (context, constraints) => SegmentedButton<PrintVariant>(
+            // Give each name and its selection check room on narrow screens,
+            // including when the user increases the text size.
+            direction:
+                constraints.maxWidth <
+                    400 * MediaQuery.textScalerOf(context).scale(14) / 14
+                ? Axis.vertical
+                : Axis.horizontal,
+            style: SegmentedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.md,
+              ),
+              visualDensity: VisualDensity.standard,
+            ),
+            segments: [
+              for (final variant in PrintVariant.values)
+                ButtonSegment(value: variant, label: Text(variant.displayName)),
+            ],
+            selected: {_variant},
+            onSelectionChanged: (selection) {
+              _variant = selection.first;
+              _refresh();
+            },
+          ),
         ),
         const SizedBox(height: AppSpacing.md),
         TextField(
@@ -123,6 +139,7 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
                       : null,
                   url: widget.qrData,
                   exporter: _exporter,
+                  isPaymentPayload: widget.type == QrLabelType.mercadoPago,
                 ),
               ],
             );

@@ -12,11 +12,13 @@ class ExportActions extends StatefulWidget {
     required this.bytes,
     required this.url,
     required this.exporter,
+    this.isPaymentPayload = false,
   });
 
   final Uint8List? bytes;
   final String url;
   final LabelExporter exporter;
+  final bool isPaymentPayload;
 
   @override
   State<ExportActions> createState() => _ExportActionsState();
@@ -63,8 +65,10 @@ class _ExportActionsState extends State<ExportActions> {
     setState(() {
       _showLink = !copied;
       _message = copied
-          ? 'Link copiado'
-          : 'Mantené presionado el link para seleccionarlo y copiarlo.';
+          ? (widget.isPaymentPayload ? 'Contenido copiado' : 'Link copiado')
+          : (widget.isPaymentPayload
+                ? 'Mantené presionado el contenido para seleccionarlo y copiarlo.'
+                : 'Mantené presionado el link para seleccionarlo y copiarlo.');
     });
   }
 
@@ -81,7 +85,9 @@ class _ExportActionsState extends State<ExportActions> {
       OutlinedButton.icon(
         onPressed: _copy,
         icon: const Icon(Icons.copy),
-        label: const Text('Copiar link'),
+        label: Text(
+          widget.isPaymentPayload ? 'Copiar contenido' : 'Copiar link',
+        ),
       ),
       if (_message != null) ...[
         const SizedBox(height: AppSpacing.sm),

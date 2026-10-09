@@ -158,11 +158,11 @@ void main() {
   }
 
   for (final name in ['Mercado Pago']) {
-    testWidgets('$name remains coming soon', (tester) async {
+    testWidgets('$name opens capture', (tester) async {
       await tester.pumpWidget(const QrGeneratorApp());
       await tester.tap(find.text(name));
       await tester.pumpAndSettle();
-      expect(find.text('Próximamente'), findsOneWidget);
+      expect(find.text('Escanear QR del comercio'), findsOneWidget);
       expect(find.byType(LabelPreviewScreen), findsNothing);
       await tester.pageBack();
       await tester.pumpAndSettle();
