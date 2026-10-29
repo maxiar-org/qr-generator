@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_generator/src/domain/poster_template.dart';
+import 'package:qr_generator/src/printing/label_image_renderer.dart'
+    show qrQuietZoneModules;
 import 'package:qr_generator/src/ui/widgets/poster_template_view.dart';
 
 const _template = PosterTemplate(
@@ -64,6 +66,70 @@ void main() {
     expect(qrRect.center.dx, closeTo(expectedCenterX, 0.5));
     expect(qrRect.center.dy, closeTo(expectedCenterY, 0.5));
   });
+
+  Future<void> expectQuietZoneReserved(
+    WidgetTester tester, {
+    required String qrData,
+  }) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 300,
+            child: PosterTemplateView(
+              template: _template,
+              qrData: qrData,
+              frameResolver: (_) async => _frame,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final viewRect = tester.getRect(find.byType(PosterTemplateView));
+    final qrRect = tester.getRect(find.byType(QrImageView));
+    final qrWidget = tester.widget<QrImageView>(find.byType(QrImageView));
+
+    final expectedFrameWidth = (_frame.right - _frame.left) * viewRect.width;
+    final expectedFrameHeight = (_frame.bottom - _frame.top) * viewRect.height;
+    final qrSize = expectedFrameWidth < expectedFrameHeight
+        ? expectedFrameWidth
+        : expectedFrameHeight;
+
+    final moduleCount = QrCode.fromData(
+      data: qrData,
+      errorCorrectLevel: qrWidget.errorCorrectionLevel,
+    ).moduleCount;
+    final cellSize = qrSize / (moduleCount + 2 * qrQuietZoneModules);
+    final expectedQuietZone = cellSize * qrQuietZoneModules;
+
+    // La zona de seguridad se reserva adentro del QrImageView (relleno
+    // blanco), no agrandando el recuadro que ocupa en el cartel.
+    expect(qrRect.width, closeTo(qrSize, 0.5));
+    expect(qrRect.height, closeTo(qrSize, 0.5));
+    expect(qrWidget.padding.left, closeTo(expectedQuietZone, 0.5));
+    expect(qrWidget.padding.top, closeTo(expectedQuietZone, 0.5));
+    expect(qrWidget.padding.right, closeTo(expectedQuietZone, 0.5));
+    expect(qrWidget.padding.bottom, closeTo(expectedQuietZone, 0.5));
+  }
+
+  testWidgets(
+    'reserva la zona de seguridad blanca del QR dentro del recuadro',
+    (tester) => expectQuietZoneReserved(
+      tester,
+      qrData: 'https://wa.me/5491122334455',
+    ),
+  );
+
+  testWidgets(
+    'reserva la zona de seguridad también con QR de muchos módulos '
+    '(datos largos, versión alta)',
+    (tester) => expectQuietZoneReserved(
+      tester,
+      qrData: 'https://mpago.la/${'a' * 500}',
+    ),
+  );
 
   testWidgets('no dibuja el QR mientras no se resolvió el recuadro', (
     tester,

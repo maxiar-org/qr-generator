@@ -6,6 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../domain/poster_template.dart';
 import '../../domain/template_frame_detector.dart';
+import '../../printing/label_image_renderer.dart' show qrQuietZoneModules;
 
 /// Resuelve el [TemplateFrame] de [template]: el explícito si lo trae, o el
 /// detectado a partir de la transparencia de su PNG si no.
@@ -92,9 +93,24 @@ class _PosterTemplateViewState extends State<PosterTemplateView> {
           data: widget.qrData,
           size: qrSize,
           backgroundColor: Colors.white,
-          padding: EdgeInsets.zero,
+          padding: EdgeInsets.all(_quietZonePadding(qrSize)),
         ),
       ),
     ];
+  }
+
+  /// Ancho en píxeles de la zona de seguridad blanca que hay que reservar
+  /// adentro del recuadro del QR, equivalente a [qrQuietZoneModules]
+  /// módulos: la misma zona mínima que reserva el renderer de la etiqueta
+  /// impresa. `QrImageView` dibuja sus módulos hasta el borde del `size`
+  /// que se le pasa, así que sin este relleno el patrón queda pegado al
+  /// marco del template.
+  double _quietZonePadding(double qrSize) {
+    final moduleCount = QrCode.fromData(
+      data: widget.qrData,
+      errorCorrectLevel: QrErrorCorrectLevel.L,
+    ).moduleCount;
+    final cellSize = qrSize / (moduleCount + 2 * qrQuietZoneModules);
+    return cellSize * qrQuietZoneModules;
   }
 }
