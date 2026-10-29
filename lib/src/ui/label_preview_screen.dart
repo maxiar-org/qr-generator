@@ -2,11 +2,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../domain/nfc_message.dart';
 import '../domain/print_variant.dart';
 import '../domain/qr_label_type.dart';
 import '../printing/label_image_renderer.dart';
 import '../export/label_exporter.dart';
 import 'export_actions.dart';
+import 'nfc_record_button.dart';
 import 'theme/app_theme.dart';
 import 'widgets/app_screen.dart';
 
@@ -140,6 +142,12 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
                   url: widget.qrData,
                   exporter: _exporter,
                   isPaymentPayload: widget.type == QrLabelType.mercadoPago,
+                ),
+                NfcRecordButton(
+                  plan: planNfcRecording(
+                    type: widget.type,
+                    qrData: widget.qrData,
+                  ),
                 ),
               ],
             );
