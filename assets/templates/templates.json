@@ -1,0 +1,26 @@
+[
+  {
+    "id": "google-resenas",
+    "name": "Google Reseñas",
+    "image": "assets/templates/google-resenas.png",
+    "tags": ["google"]
+  },
+  {
+    "id": "instagram",
+    "name": "Instagram",
+    "image": "assets/templates/instagram.png",
+    "tags": ["instagram"]
+  },
+  {
+    "id": "mercadopago",
+    "name": "Mercado Pago",
+    "image": "assets/templates/mercadopago.png",
+    "tags": ["mercadopago"]
+  },
+  {
+    "id": "whatsapp",
+    "name": "WhatsApp",
+    "image": "assets/templates/whatsapp.png",
+    "tags": ["whatsapp"]
+  }
+]

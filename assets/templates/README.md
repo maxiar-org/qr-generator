@@ -6,7 +6,8 @@ con la herramienta integrada `image_gen` y referencias JPG reducidas con Pillow
 
 Los cuatro PNG RGBA miden **1200 × 1800 px** (vertical 2:3). Solo el interior
 rectangular del recuadro tiene alfa 0; todo lo demás tiene alfa 255.
-No contienen un QR: la integración en la previsualización corresponde a #34.
+No contienen un QR: se dibuja encima en la previsualización (#34), centrado y
+escalado dentro del recuadro transparente.
 
 | Archivo | Tipo de QR |
 |---|---|
@@ -14,6 +15,43 @@ No contienen un QR: la integración en la previsualización corresponde a #34.
 | `instagram.png` | Instagram |
 | `mercadopago.png` | Mercado Pago |
 | `whatsapp.png` | WhatsApp |
+
+## Catálogo (`templates.json`)
+
+`templates.json` lista los templates que ofrece la app. Cada entrada:
+
+```json
+{
+  "id": "whatsapp",
+  "name": "WhatsApp",
+  "image": "assets/templates/whatsapp.png",
+  "tags": ["whatsapp"]
+}
+```
+
+- `id`: identificador único y estable (no se muestra).
+- `name`: nombre visible en el selector.
+- `image`: ruta del asset, relativa a la raíz del repo.
+- `tags`: tipos de QR donde aplica (`google`, `instagram`, `whatsapp`,
+  `mercadopago`; un template puede llevar varios) y, opcionalmente, el
+  formato (`adhesivo`, `mostrador`, `tarjetero`) como una etiqueta más.
+- `frame` (opcional): `[izquierda, arriba, derecha, abajo]` en coordenadas
+  **relativas** (0 a 1) al ancho y alto de la imagen, con derecha y abajo
+  **exclusivos** (mismo formato que imprime el verificador de abajo). Solo
+  hace falta para templates **sin** recuadro transparente: si la imagen es
+  un PNG con el recuadro transparente, la app lo detecta sola y `frame` se
+  puede omitir.
+
+### Sumar un template nuevo
+
+1. Agregá el PNG a esta carpeta. Si tiene el recuadro transparente (ver
+   abajo), no hace falta nada más que una entrada en `templates.json` con
+   `id`, `name`, `image` y `tags` (sin `frame`): la app calcula el recuadro
+   sola. No hace falta tocar código ni `pubspec.yaml` (la carpeta completa
+   ya está declarada como asset).
+2. Si el PNG no tiene transparencia (por ejemplo, un diseño final de
+   imprenta sin recuadro recortado), agregá `frame` a mano con las
+   coordenadas relativas del recuadro.
 
 ## Verificar o sumar un template
 
