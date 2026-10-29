@@ -8,6 +8,7 @@ import 'package:qr_generator/src/domain/qr_label_type.dart';
 import 'package:qr_generator/src/printing/label_image_renderer.dart';
 import 'package:qr_generator/src/ui/label_preview_screen.dart';
 import 'package:qr_generator/src/ui/export_actions.dart';
+import 'package:qr_generator/src/ui/widgets/poster_fullscreen_view.dart';
 import 'package:qr_generator/src/ui/widgets/poster_template_view.dart';
 import 'package:qr_generator/src/ui/widgets/template_selector.dart';
 
@@ -218,6 +219,45 @@ void main() {
         find.byType(PosterTemplateView),
       );
       expect(posterView.template.id, 'whatsapp');
+    });
+
+    testWidgets('el botón de pantalla completa abre y se puede cerrar', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LabelPreviewScreen(
+            type: QrLabelType.whatsapp,
+            qrData: 'https://wa.me/5491122334455',
+            renderer: const _FakeRenderer(),
+            loadTemplateCatalog: loadFakeCatalog,
+            templateFrameResolver: instantFrame,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.text('Ver en pantalla completa'),
+        200,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const Key('appScreenScrollView')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Ver en pantalla completa'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PosterFullscreenScreen), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Cerrar'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PosterFullscreenScreen), findsNothing);
+      expect(find.byType(LabelPreviewScreen), findsOneWidget);
     });
   });
 }

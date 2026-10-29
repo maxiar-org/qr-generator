@@ -9,6 +9,7 @@ import '../export/label_exporter.dart';
 import 'export_actions.dart';
 import 'theme/app_theme.dart';
 import 'widgets/app_screen.dart';
+import 'widgets/poster_fullscreen_view.dart';
 import 'widgets/poster_template_view.dart';
 import 'widgets/template_selector.dart';
 
@@ -130,7 +131,25 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
                     frameResolver: widget.templateFrameResolver,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.sm),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        fullscreenDialog: true,
+                        builder: (_) => PosterFullscreenScreen(
+                          template: selected,
+                          qrData: widget.qrData,
+                          templateFrameResolver: widget.templateFrameResolver,
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(Icons.fullscreen),
+                    label: const Text('Ver en pantalla completa'),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
               ],
             );
           },
