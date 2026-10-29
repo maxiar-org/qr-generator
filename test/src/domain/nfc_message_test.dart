@@ -59,4 +59,26 @@ void main() {
       expect(plan, isA<NfcUnsupportedPlan>(), reason: value);
     }
   });
+
+  test('encodes the NFC Forum well-known URI record payload', () {
+    expect(
+      encodeNdefUriPayload('https://wa.me/5491112345678'),
+      [0x04, ...'wa.me/5491112345678'.codeUnits],
+    );
+    expect(
+      encodeNdefUriPayload('http://example.com'),
+      [0x03, ...'example.com'.codeUnits],
+    );
+    expect(
+      encodeNdefUriPayload('https://www.instagram.com/comercio'),
+      [0x02, ...'instagram.com/comercio'.codeUnits],
+    );
+  });
+
+  test('falls back to no abbreviation for a scheme outside the table', () {
+    expect(
+      encodeNdefUriPayload('custom-scheme://thing'),
+      [0x00, ...'custom-scheme://thing'.codeUnits],
+    );
+  });
 }
