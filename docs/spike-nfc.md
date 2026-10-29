@@ -40,9 +40,12 @@ iniciar la sesión, confirmar con `queryNDEFStatus` que el tag admite
   adelante para lectura), pero eso no está confirmado en una fuente oficial
   de Apple — no lo tomamos como dato duro.
 - **Entitlement:** `com.apple.developer.nfc.readersession.formats`, con
-  valor `NDEF` para este caso. Se agrega automáticamente al activar la
-  capability "Near Field Communication Tag Reading" en Xcode (Signing &
-  Capabilities); no hace falta (ni corresponde) escribirlo a mano. Fuente:
+  valor `TAG` para este prototipo: `nfc_manager` 4.2.1 usa
+  `NFCTagReaderSession`, aunque el contenido escrito sea NDEF. El valor
+  `NDEF` corresponde a `NFCNDEFReaderSession` y no habilita la sesión del
+  plugin. Activá "Near Field Communication Tag Reading" en Xcode y
+  verificá que el perfil de firma incluya `TAG`, como el entitlement
+  versionado en el prototipo. Fuente:
   [entitlement oficial](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.developer.nfc.readersession.formats).
   No hay un entitlement distinto para lectura vs. escritura: un ingeniero de
   Apple lo confirma en el [foro de desarrolladores](https://developer.apple.com/forums/thread/793377):
@@ -138,11 +141,15 @@ Según el datasheet de NXP (`NTAG213_215_216.pdf`):
 | --- | --- | --- |
 | NTAG213 | 144 bytes | Todas las URLs de este spike, con margen de sobra (la más larga, Google Reseñas con Place ID, ronda 80-120 caracteres) |
 | NTAG215 | 504 bytes | Lo mismo, con mucho margen extra si se agrega un segundo registro (p. ej. Smart Poster con título) |
-| NTAG216 | 888 bytes | Igual, rara vez necesario para este caso de uso |
+| NTAG216 | 888 bytes | Enlaces más largos; verificar el tamaño codificado antes de elegir |
 
-**Recomendación: NTAG213** alcanza para cualquier URL que genera esta app;
-no hace falta pagar de más por 215/216 salvo que a futuro se agreguen varios
-registros NDEF por tag. Formato físico sugerido: sticker adhesivo circular
+**Recomendación: NTAG213 para enlaces cortos.** No alcanza para cualquier
+URL de la app: WhatsApp admite mensajes de hasta 300 caracteres y el escape
+de la URL puede aumentar mucho su tamaño. Incluso 200 letras ASCII superan
+los 144 bytes disponibles. Compará los bytes del mensaje NDEF completo
+(payload codificado y encabezados, más el espacio de formato del tag) con
+la capacidad disponible. Para enlaces con texto, evaluá NTAG215/216; tampoco
+un tag mayor garantiza que entre cualquier mensaje. Formato físico sugerido: sticker adhesivo circular
 de 25 mm, para pegar directo detrás del cartel impreso (el otro formato
 común, tarjeta PVC tipo credencial, no tiene sentido para este uso porque no
 es para pegar).
@@ -257,9 +264,16 @@ flutter test
 flutter test --dart-define=NFC_SPIKE=true
 ```
 
-El prototipo de iOS no mockea `NfcManager` (usa una API generada con Pigeon,
-sin un punto de inyección simple como el `MethodChannel` del spike #8): sus
-tests cubren que el flag apagado no ofrece grabar y que, con el flag
+El prototipo usa un adaptador inyectable para simular la sesión y el tag.
+Los tests cubren timeout, cancelación, cierre antes del reintento, callbacks
+tardíos y descubrimientos duplicados, incluyendo un timeout durante la
+escritura que impide iniciar el bloqueo. También cubren que el flag apagado no ofrece grabar y que, con el flag
 prendido, el botón se habilita o se deshabilita según el tipo de QR y el
 caso EMVCo. La sesión NFC real —descubrir el tag, escribir, bloquear— solo
 se puede probar con un iPhone y un tag físicos.
+
+La escritura web recibe un `AbortSignal`: «Cancelar grabación» y la salida
+de la pantalla abortan la operación pendiente. En iOS, todas las salidas
+cierran explícitamente la sesión antes de permitir reintentar. Una operación
+física ya iniciada no se puede deshacer; al terminar la sesión se descartan
+los callbacks tardíos y no se inicia un bloqueo posterior.

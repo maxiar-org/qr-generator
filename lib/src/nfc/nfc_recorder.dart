@@ -15,5 +15,8 @@ abstract interface class NfcRecorder {
   /// runtime, not just by target: e.g. desktop Chrome has no NFC hardware.
   bool get isAvailable;
 
+  /// Aborts the pending physical write; safe when idle.
+  void cancel();
+
   Future<NfcWriteResult> writeUri(String url);
 }

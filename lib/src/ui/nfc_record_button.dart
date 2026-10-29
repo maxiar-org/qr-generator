@@ -31,6 +31,12 @@ class _NfcRecordButtonState extends State<NfcRecordButton> {
     _recorder = widget.recorder ?? NfcRecorder();
   }
 
+  @override
+  void dispose() {
+    _recorder.cancel();
+    super.dispose();
+  }
+
   Future<void> _record(String url) async {
     setState(() {
       _busy = true;
@@ -49,8 +55,7 @@ class _NfcRecordButtonState extends State<NfcRecordButton> {
     } catch (_) {
       if (mounted) {
         setState(
-          () => _message =
-              'No se pudo grabar la etiqueta NFC. Acercá el tag y probá de nuevo.',
+          () => _message = 'No se pudo grabar la etiqueta NFC. Acercá el tag y probá de nuevo.',
         );
       }
     } finally {
@@ -80,6 +85,11 @@ class _NfcRecordButtonState extends State<NfcRecordButton> {
             icon: const Icon(Icons.nfc),
             label: const Text('Grabar NFC'),
           ),
+          if (_busy)
+            TextButton(
+              onPressed: _recorder.cancel,
+              child: const Text('Cancelar grabación'),
+            ),
           if (_message != null) ...[
             const SizedBox(height: AppSpacing.sm),
             Text(

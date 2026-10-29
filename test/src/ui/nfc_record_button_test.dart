@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_generator/src/domain/nfc_message.dart';
@@ -10,6 +12,13 @@ class FakeNfcRecorder implements NfcRecorder {
   @override
   bool isAvailable;
   bool fail = false;
+  Completer<NfcWriteResult>? pending;
+  @override
+  void cancel() {
+    pending?.complete(NfcWriteResult.cancelled);
+    pending = null;
+  }
+
   NfcWriteResult result = NfcWriteResult.written;
   String? writtenUrl;
 
@@ -17,7 +26,7 @@ class FakeNfcRecorder implements NfcRecorder {
   Future<NfcWriteResult> writeUri(String url) async {
     if (fail) throw StateError('failed');
     writtenUrl = url;
-    return result;
+    return pending == null ? result : await pending!.future;
   }
 }
 
@@ -39,6 +48,47 @@ void main() {
     );
   }
 
+  testWidgets('cancels a pending write when its route is popped', (
+    tester,
+  ) async {
+    await show(tester);
+    final context = tester.element(find.byType(NfcRecordButton));
+    final pendingRecorder = FakeNfcRecorder()..pending = Completer();
+    final pending = pendingRecorder.pending!.future;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => Scaffold(
+          body: NfcRecordButton(
+            plan: const NfcUriRecordPlan(url),
+            recorder: pendingRecorder,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Grabar NFC').last);
+    await tester.pump();
+    Navigator.of(tester.element(find.byType(NfcRecordButton).last)).pop();
+    await tester.pumpAndSettle();
+    expect(pendingRecorder.pending, isNull);
+    expect(await pending, NfcWriteResult.cancelled);
+  });
+
+  testWidgets('offers cancellation while waiting and allows retry', (
+    tester,
+  ) async {
+    await show(tester);
+    recorder.pending = Completer();
+    await tester.tap(find.text('Grabar NFC'));
+    await tester.pump();
+    await tester.tap(find.text('Cancelar grabación'));
+    await tester.pumpAndSettle();
+    expect(recorder.pending, isNull);
+    await tester.tap(find.text('Grabar NFC'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('grabada'), findsOneWidget);
+  });
+
   testWidgets('hides entirely when the platform has no NFC support', (
     tester,
   ) async {
@@ -57,9 +107,7 @@ void main() {
     expect(find.text('Grabar NFC'), findsNothing);
   });
 
-  testWidgets('offers to record the exact URL when available', (
-    tester,
-  ) async {
+  testWidgets('offers to record the exact URL when available', (tester) async {
     await show(tester);
     await tester.tap(find.text('Grabar NFC'));
     await tester.pumpAndSettle();

@@ -9,6 +9,9 @@ class _UnavailableNfcRecorder implements NfcRecorder {
   const _UnavailableNfcRecorder();
 
   @override
+  void cancel() {}
+
+  @override
   bool get isAvailable => false;
 
   @override

@@ -15,8 +15,7 @@ const nfcSpikeEnabled = bool.fromEnvironment('NFC_SPIKE');
 const _demoQrData = <QrLabelType, String>{
   QrLabelType.whatsapp: 'https://wa.me/5491112345678',
   QrLabelType.instagram: 'https://instagram.com/ejemplo',
-  QrLabelType.googleReviews:
-      'https://search.google.com/local/writereview?placeid=ChIJdemo00000000000000000000',
+  QrLabelType.googleReviews: 'https://search.google.com/local/writereview?placeid=ChIJdemo00000000000000000000',
   QrLabelType.mercadoPago: 'https://mpago.la/pos/DEMO-NO-PAGAR',
 };
 
@@ -66,8 +65,6 @@ class _SpikeScreenState extends State<SpikeScreen> {
       setState(() => _status = 'Grabado: $url');
     } catch (error) {
       if (!mounted) return;
-      // A Dart timeout does not cancel the native session. Do not retry
-      // immediately: a late callback could complete a newer request.
       setState(() => _status = 'Error: $error');
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -108,9 +105,7 @@ class _SpikeScreenState extends State<SpikeScreen> {
                 ),
                 if (_type == QrLabelType.mercadoPago)
                   SwitchListTile(
-                    title: const Text(
-                      'Simular payload EMVCo (no un link)',
-                    ),
+                    title: const Text('Simular payload EMVCo (no un link)'),
                     value: _useEmvDemo,
                     onChanged: _busy
                         ? null
@@ -127,12 +122,10 @@ class _SpikeScreenState extends State<SpikeScreen> {
                       : (value) => setState(() => _lock = value),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  switch (plan) {
-                    NfcUriRecordPlan() => 'Se va a grabar: ${plan.url}',
-                    NfcUnsupportedPlan() => plan.reason,
-                  },
-                ),
+                Text(switch (plan) {
+                  NfcUriRecordPlan() => 'Se va a grabar: ${plan.url}',
+                  NfcUnsupportedPlan() => plan.reason,
+                }),
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: _busy || plan is! NfcUriRecordPlan
