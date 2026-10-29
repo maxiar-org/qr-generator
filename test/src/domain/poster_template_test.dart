@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_generator/src/domain/poster_template.dart';
 import 'package:qr_generator/src/domain/qr_label_type.dart';
@@ -76,6 +78,44 @@ void main() {
 
     test('devuelve una lista vacía si ningún template aplica', () {
       expect(templatesForType(templates, QrLabelType.mercadoPago), isEmpty);
+    });
+  });
+
+  group('loadPosterTemplateCatalog', () {
+    test('lee el JSON desde la ruta por defecto y lo parsea', () async {
+      final requestedPaths = <String>[];
+      final templates = await loadPosterTemplateCatalog(
+        loadString: (path) async {
+          requestedPaths.add(path);
+          return _catalogJson;
+        },
+      );
+
+      expect(requestedPaths, ['assets/templates/templates.json']);
+      expect(templates, hasLength(3));
+    });
+  });
+
+  group('assets/templates/templates.json real', () {
+    // Lee el archivo directo del disco (sin rootBundle) para no depender del
+    // motor gráfico ni del asset bundle: solo verifica que el catálogo que
+    // se va a empaquetar tiene la forma que espera parsePosterTemplateCatalog.
+    final templates = parsePosterTemplateCatalog(
+      File('assets/templates/templates.json').readAsStringSync(),
+    );
+
+    test('tiene un template por cada tipo de QR, sin frame explícito', () {
+      expect(templates, hasLength(4));
+      for (final template in templates) {
+        expect(template.frame, isNull);
+        expect(File(template.image).existsSync(), isTrue);
+      }
+    });
+
+    test('cada tipo de QR tiene exactamente un template', () {
+      for (final type in QrLabelType.values) {
+        expect(templatesForType(templates, type), hasLength(1));
+      }
     });
   });
 }

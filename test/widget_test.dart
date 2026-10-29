@@ -18,6 +18,22 @@ Future<void> expectPrintedUrl(WidgetTester tester, String url) async {
     await tester.pump();
     if (find.byType(ExportActions).evaluate().isNotEmpty) break;
   }
+  if (find.byType(ExportActions).evaluate().isEmpty) {
+    // El selector de templates puede empujar la etiqueta fuera del
+    // viewport inicial: hace falta bajar el scroll para que el ListView
+    // la construya. Apunta al ListView de AppScreen por clave porque el
+    // selector de templates agrega su propio ListView horizontal.
+    await tester.scrollUntilVisible(
+      find.byType(ExportActions),
+      300,
+      scrollable: find
+          .descendant(
+            of: find.byKey(const Key('appScreenScrollView')),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+  }
   final actions = tester.widget<ExportActions>(find.byType(ExportActions));
   expect(actions.url, url);
   expect(actions.bytes, isNotNull);

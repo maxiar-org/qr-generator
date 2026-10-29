@@ -92,3 +92,13 @@ List<PosterTemplate> templatesForType(
   List<PosterTemplate> templates,
   QrLabelType type,
 ) => templates.where((template) => template.appliesTo(type)).toList();
+
+/// Lee un archivo de texto por su ruta de asset (p. ej. `rootBundle.loadString`).
+typedef AssetStringLoader = Future<String> Function(String path);
+
+/// Carga y parsea el catálogo de templates. Inyectar [loadString] evita que
+/// esta capa dependa directamente de Flutter para poder testearla.
+Future<List<PosterTemplate>> loadPosterTemplateCatalog({
+  required AssetStringLoader loadString,
+  String path = 'assets/templates/templates.json',
+}) async => parsePosterTemplateCatalog(await loadString(path));

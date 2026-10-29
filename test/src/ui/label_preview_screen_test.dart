@@ -3,10 +3,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:qr_generator/src/domain/poster_template.dart';
 import 'package:qr_generator/src/domain/qr_label_type.dart';
 import 'package:qr_generator/src/printing/label_image_renderer.dart';
 import 'package:qr_generator/src/ui/label_preview_screen.dart';
 import 'package:qr_generator/src/ui/export_actions.dart';
+import 'package:qr_generator/src/ui/widgets/poster_template_view.dart';
+import 'package:qr_generator/src/ui/widgets/template_selector.dart';
 
 /// PNG mínimo (1x1) para no depender del motor gráfico real en estos tests;
 /// el contenido exacto del PNG ya está cubierto por label_image_renderer_test.
@@ -39,6 +42,10 @@ class _RecordingRenderer extends LabelImageRenderer {
   }
 }
 
+/// Sin templates: los tests que solo ejercitan la etiqueta a imprimir no
+/// necesitan depender de `rootBundle` ni del catálogo real.
+Future<List<PosterTemplate>> _noTemplates() async => const [];
+
 void main() {
   testWidgets('keeps the supplied review URL when editing the label', (
     tester,
@@ -52,6 +59,7 @@ void main() {
           type: QrLabelType.googleReviews,
           qrData: reviewUrl,
           renderer: renderer,
+          loadTemplateCatalog: _noTemplates,
         ),
       ),
     );
@@ -69,11 +77,12 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp(
         home: LabelPreviewScreen(
           type: QrLabelType.whatsapp,
           qrData: 'https://instagram.com/comercio',
-          renderer: _FakeRenderer(),
+          renderer: const _FakeRenderer(),
+          loadTemplateCatalog: _noTemplates,
         ),
       ),
     );
@@ -90,11 +99,12 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp(
         home: LabelPreviewScreen(
           type: QrLabelType.googleReviews,
           qrData: 'https://instagram.com/comercio',
-          renderer: _FakeRenderer(),
+          renderer: const _FakeRenderer(),
+          loadTemplateCatalog: _noTemplates,
         ),
       ),
     );
@@ -105,5 +115,109 @@ void main() {
 
     expect(find.text('Gracias por tu visita'), findsOneWidget);
     expect(find.text(QrLabelType.googleReviews.defaultText), findsNothing);
+  });
+
+  group('selector de templates', () {
+    // Catálogo de prueba con la misma forma que assets/templates/templates.json,
+    // con un template por tipo más uno que sirve para dos tipos a la vez.
+    final fakeCatalog = [
+      const PosterTemplate(
+        id: 'google-resenas',
+        name: 'Google Reseñas',
+        image: 'assets/templates/google-resenas.png',
+        tags: {'google'},
+      ),
+      const PosterTemplate(
+        id: 'instagram',
+        name: 'Instagram',
+        image: 'assets/templates/instagram.png',
+        tags: {'instagram'},
+      ),
+      const PosterTemplate(
+        id: 'mercadopago',
+        name: 'Mercado Pago',
+        image: 'assets/templates/mercadopago.png',
+        tags: {'mercadopago'},
+      ),
+      const PosterTemplate(
+        id: 'whatsapp',
+        name: 'WhatsApp',
+        image: 'assets/templates/whatsapp.png',
+        tags: {'whatsapp'},
+      ),
+      const PosterTemplate(
+        id: 'generico',
+        name: 'Genérico',
+        image: 'assets/templates/whatsapp.png',
+        tags: {'whatsapp', 'instagram'},
+      ),
+    ];
+    Future<List<PosterTemplate>> loadFakeCatalog() async => fakeCatalog;
+    Future<TemplateFrame> instantFrame(PosterTemplate template) async =>
+        const TemplateFrame(left: 0.2, top: 0.3, right: 0.8, bottom: 0.7);
+
+    const expectedNames = {
+      QrLabelType.googleReviews: ['Google Reseñas'],
+      QrLabelType.instagram: ['Instagram', 'Genérico'],
+      QrLabelType.mercadoPago: ['Mercado Pago'],
+      QrLabelType.whatsapp: ['WhatsApp', 'Genérico'],
+    };
+
+    for (final type in QrLabelType.values) {
+      testWidgets(
+        'con un QR de ${type.name} solo aparecen los templates de ${expectedNames[type]}',
+        (tester) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LabelPreviewScreen(
+                type: type,
+                qrData: 'contenido de prueba',
+                renderer: const _FakeRenderer(),
+                loadTemplateCatalog: loadFakeCatalog,
+                templateFrameResolver: instantFrame,
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final selector = tester.widget<TemplateSelector>(
+            find.byType(TemplateSelector),
+          );
+          expect(
+            selector.templates.map((t) => t.name).toList(),
+            expectedNames[type],
+          );
+
+          final allOtherNames = fakeCatalog
+              .map((t) => t.name)
+              .where((name) => !expectedNames[type]!.contains(name));
+          for (final otherName in allOtherNames) {
+            expect(find.text(otherName), findsNothing);
+          }
+        },
+      );
+    }
+
+    testWidgets('elige el primer template que aplica por defecto', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LabelPreviewScreen(
+            type: QrLabelType.whatsapp,
+            qrData: 'https://wa.me/5491122334455',
+            renderer: const _FakeRenderer(),
+            loadTemplateCatalog: loadFakeCatalog,
+            templateFrameResolver: instantFrame,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final posterView = tester.widget<PosterTemplateView>(
+        find.byType(PosterTemplateView),
+      );
+      expect(posterView.template.id, 'whatsapp');
+    });
   });
 }
