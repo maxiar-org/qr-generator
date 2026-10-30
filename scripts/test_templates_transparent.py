@@ -1,4 +1,5 @@
 """Pruebas del contrato de transparencia de los templates."""
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -44,9 +45,9 @@ class TemplateTests(unittest.TestCase):
 
     def test_deliverables(self):
         root = Path(__file__).resolve().parents[1] / 'assets/templates'
-        for name in ('google-resenas', 'instagram', 'mercadopago', 'whatsapp'):
-            with self.subTest(name=name):
-                validate_template(root / f'{name}.png')
+        for template in json.loads((root / 'templates.json').read_text()):
+            with self.subTest(name=template['id']):
+                validate_template(root / Path(template['image']).name)
 
 
 if __name__ == '__main__':

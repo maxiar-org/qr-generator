@@ -3,24 +3,64 @@
     "id": "google-resenas",
     "name": "Google Reseñas",
     "image": "assets/templates/google-resenas.png",
-    "tags": ["google"]
+    "tags": [
+      "google"
+    ]
   },
   {
     "id": "instagram",
     "name": "Instagram",
     "image": "assets/templates/instagram.png",
-    "tags": ["instagram"]
+    "tags": [
+      "instagram"
+    ]
   },
   {
     "id": "mercadopago",
     "name": "Mercado Pago",
     "image": "assets/templates/mercadopago.png",
-    "tags": ["mercadopago"]
+    "tags": [
+      "mercadopago"
+    ]
   },
   {
     "id": "whatsapp",
     "name": "WhatsApp",
     "image": "assets/templates/whatsapp.png",
-    "tags": ["whatsapp"]
+    "tags": [
+      "whatsapp"
+    ]
+  },
+  {
+    "id": "google-resenas-noche",
+    "name": "Noche",
+    "image": "assets/templates/google-resenas-noche.png",
+    "tags": [
+      "google"
+    ]
+  },
+  {
+    "id": "instagram-ciruela",
+    "name": "Ciruela",
+    "image": "assets/templates/instagram-ciruela.png",
+    "tags": [
+      "instagram"
+    ]
+  },
+  {
+    "id": "mercadopago-celeste",
+    "name": "Celeste",
+    "image": "assets/templates/mercadopago-celeste.png",
+    "tags": [
+      "mercadopago"
+    ]
+  },
+  {
+    "id": "whatsapp-verde",
+    "name": "Verde",
+    "image": "assets/templates/whatsapp-verde.png",
+    "tags": [
+      "whatsapp"
+    ]
   }
 ]
