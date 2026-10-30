@@ -28,3 +28,12 @@ jobs:
         working-directory: prototypes/lpapi_ios
       - run: flutter test --dart-define=LPAPI_SPIKE=true
         working-directory: prototypes/lpapi_ios
+      - run: flutter test --platform chrome test/src/nfc/nfc_recorder_web_test.dart
+      - run: flutter pub get
+        working-directory: prototypes/nfc_ios
+      - run: flutter analyze
+        working-directory: prototypes/nfc_ios
+      - run: flutter test
+        working-directory: prototypes/nfc_ios
+      - run: flutter test --dart-define=NFC_SPIKE=true
+        working-directory: prototypes/nfc_ios

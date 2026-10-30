@@ -4,10 +4,12 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_generator/src/domain/poster_template.dart';
+import 'package:qr_generator/src/domain/nfc_message.dart';
 import 'package:qr_generator/src/domain/qr_label_type.dart';
 import 'package:qr_generator/src/printing/label_image_renderer.dart';
 import 'package:qr_generator/src/ui/label_preview_screen.dart';
 import 'package:qr_generator/src/ui/export_actions.dart';
+import 'package:qr_generator/src/ui/nfc_record_button.dart';
 import 'package:qr_generator/src/ui/widgets/poster_fullscreen_view.dart';
 import 'package:qr_generator/src/ui/widgets/poster_template_view.dart';
 import 'package:qr_generator/src/ui/widgets/template_selector.dart';
@@ -66,6 +68,10 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(renderer.receivedData, [reviewUrl]);
+    final nfcButton = tester.widget<NfcRecordButton>(
+      find.byType(NfcRecordButton),
+    );
+    expect((nfcButton.plan as NfcUriRecordPlan).url, reviewUrl);
     expect(
       tester.widget<ExportActions>(find.byType(ExportActions)).url,
       reviewUrl,
@@ -198,6 +204,11 @@ void main() {
           await tester.pumpAndSettle();
 
           expect(find.byType(TextField), findsNothing);
+          expect(find.byType(PosterTemplateView), findsOneWidget);
+          final nfcButton = tester.widget<NfcRecordButton>(
+            find.byType(NfcRecordButton),
+          );
+          expect(nfcButton.plan, isA<NfcUnsupportedPlan>());
           expect(
             find.widgetWithText(FilledButton, 'Guardar imagen'),
             findsOneWidget,

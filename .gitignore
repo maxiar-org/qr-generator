@@ -49,3 +49,4 @@ app.*.map.json
 
 # Skills de agentes: el motor de impeccable se descarga en el primer uso (verificado con SHA-256)
 .agents/skills/impeccable/scripts/bin/
+.playwright-mcp/

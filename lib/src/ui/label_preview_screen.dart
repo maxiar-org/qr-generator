@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../domain/nfc_message.dart';
 import '../domain/poster_template.dart';
 import '../domain/qr_label_type.dart';
 import '../printing/label_image_renderer.dart';
 import '../export/label_exporter.dart';
 import 'export_actions.dart';
+import 'nfc_record_button.dart';
 import 'theme/app_theme.dart';
 import 'widgets/app_screen.dart';
 import 'widgets/poster_fullscreen_view.dart';
@@ -148,13 +150,23 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             }
-            return ExportActions(
-              bytes: snapshot.connectionState == ConnectionState.done
-                  ? snapshot.data
-                  : null,
-              url: widget.qrData,
-              exporter: _exporter,
-              isPaymentPayload: widget.type == QrLabelType.mercadoPago,
+            return Column(
+              children: [
+                ExportActions(
+                  bytes: snapshot.connectionState == ConnectionState.done
+                      ? snapshot.data
+                      : null,
+                  url: widget.qrData,
+                  exporter: _exporter,
+                  isPaymentPayload: widget.type == QrLabelType.mercadoPago,
+                ),
+                NfcRecordButton(
+                  plan: planNfcRecording(
+                    type: widget.type,
+                    qrData: widget.qrData,
+                  ),
+                ),
+              ],
             );
           },
         ),
