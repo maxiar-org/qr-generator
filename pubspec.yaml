@@ -22,6 +22,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/templates/
   fonts:
     - family: IBM Plex Sans
       fonts:

@@ -1,9 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../domain/nfc_message.dart';
-import '../domain/print_variant.dart';
+import '../domain/poster_template.dart';
 import '../domain/qr_label_type.dart';
 import '../printing/label_image_renderer.dart';
 import '../export/label_exporter.dart';
@@ -11,15 +10,30 @@ import 'export_actions.dart';
 import 'nfc_record_button.dart';
 import 'theme/app_theme.dart';
 import 'widgets/app_screen.dart';
+import 'widgets/poster_fullscreen_view.dart';
+import 'widgets/poster_template_view.dart';
+import 'widgets/template_selector.dart';
 
-/// Vista previa de la etiqueta a imprimir para un [QrLabelType], con
-/// selector de variante y texto editable.
+/// El catálogo no cambia durante la vida de la app: se carga una sola vez y
+/// se reutiliza en cada pantalla, en vez de releer y reparsear el JSON cada
+/// vez que el comercio abre una previsualización.
+Future<List<PosterTemplate>>? _bundledTemplateCatalog;
+
+Future<List<PosterTemplate>> _loadBundledTemplateCatalog() =>
+    _bundledTemplateCatalog ??= loadPosterTemplateCatalog(
+      loadString: rootBundle.loadString,
+    );
+
+/// Vista previa de la etiqueta a imprimir para un [QrLabelType], con el
+/// cartel de cartelería real que le corresponde.
 class LabelPreviewScreen extends StatefulWidget {
   const LabelPreviewScreen({
     super.key,
     required this.type,
     required this.qrData,
     this.renderer,
+    this.loadTemplateCatalog,
+    this.templateFrameResolver = resolveTemplateFrame,
   });
 
   final QrLabelType type;
@@ -29,6 +43,15 @@ class LabelPreviewScreen extends StatefulWidget {
   /// del motor gráfico real.
   final LabelImageRenderer? renderer;
 
+  /// Permite reemplazar la carga del catálogo de templates en los tests,
+  /// sin depender de `rootBundle`.
+  final Future<List<PosterTemplate>> Function()? loadTemplateCatalog;
+
+  /// Permite reemplazar la resolución del recuadro de cada template en los
+  /// tests por una síncrona, sin depender de decodificar el PNG real.
+  final Future<TemplateFrame> Function(PosterTemplate template)
+  templateFrameResolver;
+
   @override
   State<LabelPreviewScreen> createState() => _LabelPreviewScreenState();
 }
@@ -36,108 +59,102 @@ class LabelPreviewScreen extends StatefulWidget {
 class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
   late final LabelImageRenderer _renderer;
   late final LabelExporter _exporter;
-  late final TextEditingController _textController;
-  PrintVariant _variant = PrintVariant.sticker;
-  late Future<Uint8List> _imageFuture;
+  late final Future<Uint8List> _imageFuture;
+  late final Future<List<PosterTemplate>> _templatesFuture;
+  PosterTemplate? _selectedTemplate;
 
   @override
   void initState() {
     super.initState();
     _exporter = LabelExporter();
     _renderer = widget.renderer ?? const LabelImageRenderer();
-    _textController = TextEditingController(text: widget.type.defaultText);
     _imageFuture = _render();
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    super.dispose();
+    _templatesFuture =
+        (widget.loadTemplateCatalog ?? _loadBundledTemplateCatalog)()
+            .then((all) => templatesForType(all, widget.type))
+            .then((filtered) {
+              if (mounted && filtered.isNotEmpty) {
+                setState(() => _selectedTemplate = filtered.first);
+              }
+              return filtered;
+            });
   }
 
   Future<Uint8List> _render() => _renderer.render(
     qrData: widget.qrData,
     type: widget.type,
-    variant: _variant,
-    text: _textController.text,
+    text: widget.type.defaultText,
   );
-
-  void _refresh() => setState(() {
-    _imageFuture = _render();
-  });
 
   @override
   Widget build(BuildContext context) {
-    final size = printVariantSizes[_variant]!;
     return AppScreen(
       screenTitle: widget.type.displayName,
       currentType: widget.type,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) => SegmentedButton<PrintVariant>(
-            // Give each name and its selection check room on narrow screens,
-            // including when the user increases the text size.
-            direction:
-                constraints.maxWidth <
-                    400 * MediaQuery.textScalerOf(context).scale(14) / 14
-                ? Axis.vertical
-                : Axis.horizontal,
-            style: SegmentedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.md,
-              ),
-              visualDensity: VisualDensity.standard,
-            ),
-            segments: [
-              for (final variant in PrintVariant.values)
-                ButtonSegment(value: variant, label: Text(variant.displayName)),
-            ],
-            selected: {_variant},
-            onSelectionChanged: (selection) {
-              _variant = selection.first;
-              _refresh();
-            },
-          ),
+        FutureBuilder<List<PosterTemplate>>(
+          future: _templatesFuture,
+          builder: (context, snapshot) {
+            final templates = snapshot.data ?? const [];
+            if (templates.isEmpty) return const SizedBox.shrink();
+            final selected = _selectedTemplate ?? templates.first;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Así queda en el cartel',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                TemplateSelector(
+                  templates: templates,
+                  selected: selected,
+                  onSelected: (template) =>
+                      setState(() => _selectedTemplate = template),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: PosterTemplateView(
+                    template: selected,
+                    qrData: widget.qrData,
+                    frameResolver: widget.templateFrameResolver,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        fullscreenDialog: true,
+                        builder: (_) => PosterFullscreenScreen(
+                          template: selected,
+                          qrData: widget.qrData,
+                          templateFrameResolver: widget.templateFrameResolver,
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(Icons.fullscreen),
+                    label: const Text('Ver en pantalla completa'),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+              ],
+            );
+          },
         ),
-        const SizedBox(height: AppSpacing.md),
-        TextField(
-          controller: _textController,
-          decoration: const InputDecoration(labelText: 'Texto de la etiqueta'),
-          onChanged: (_) => _refresh(),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          '${size.width} x ${size.height} px',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: AppSpacing.sm),
         FutureBuilder<Uint8List>(
           future: _imageFuture,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             }
-            final bytes = snapshot.data;
-            if (bytes == null) {
-              return const Padding(
-                padding: EdgeInsets.all(AppSpacing.xl),
-                child: Center(child: Text('Generando…')),
-              );
-            }
             return Column(
               children: [
-                Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    child: Image.memory(bytes, gaplessPlayback: true),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
                 ExportActions(
                   bytes: snapshot.connectionState == ConnectionState.done
-                      ? bytes
+                      ? snapshot.data
                       : null,
                   url: widget.qrData,
                   exporter: _exporter,

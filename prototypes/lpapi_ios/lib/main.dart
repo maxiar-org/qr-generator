@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dothantech_lpapi_thermal_printer/flutter_dothantech_lpapi_thermal_printer.dart';
 // This separate spike reuses the exact rasterizer accepted in issue #4.
 // ignore: implementation_imports
-import 'package:qr_generator/src/domain/print_variant.dart';
-// ignore: implementation_imports
 import 'package:qr_generator/src/domain/qr_label_type.dart';
 // ignore: implementation_imports
 import 'package:qr_generator/src/printing/label_image_renderer.dart';
@@ -72,7 +70,6 @@ class _SpikeScreenState extends State<SpikeScreen> {
     final png = await const LabelImageRenderer().render(
       qrData: 'https://example.com/lpapi-dt01',
       type: QrLabelType.instagram,
-      variant: PrintVariant.sticker,
       text: 'Prueba DT01 — 464 px',
     );
     if (!mounted) return;

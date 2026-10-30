@@ -16,4 +16,13 @@ extension QrLabelTypeDetails on QrLabelType {
     QrLabelType.googleReviews => '¡Dejanos tu reseña!',
     QrLabelType.mercadoPago => '¡Pagá con Mercado Pago!',
   };
+
+  /// Tag usado en `assets/templates/templates.json` para marcar los
+  /// templates de cartelería que aplican a este tipo de QR.
+  String get templateTag => switch (this) {
+    QrLabelType.whatsapp => 'whatsapp',
+    QrLabelType.instagram => 'instagram',
+    QrLabelType.googleReviews => 'google',
+    QrLabelType.mercadoPago => 'mercadopago',
+  };
 }
