@@ -6,7 +6,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:qr/qr.dart';
 
-import '../domain/print_variant.dart';
+import '../domain/label_size.dart';
 import '../domain/qr_label_type.dart';
 import 'label_icons.dart';
 
@@ -16,19 +16,17 @@ import 'label_icons.dart';
 const int qrQuietZoneModules = 4;
 
 /// Genera el PNG en blanco y negro que se imprime en la DT01: QR, ícono del
-/// tipo y un texto corto, con el tamaño exacto de la [PrintVariant] elegida.
+/// tipo y un texto corto, con el tamaño fijo de [labelPixelSize].
 class LabelImageRenderer {
   const LabelImageRenderer();
 
   Future<Uint8List> render({
     required String qrData,
     required QrLabelType type,
-    required PrintVariant variant,
     required String text,
   }) async {
-    final size = printVariantSizes[variant]!;
-    final width = size.width.toDouble();
-    final height = size.height.toDouble();
+    final width = labelPixelSize.toDouble();
+    final height = labelPixelSize.toDouble();
 
     final margin = width * 0.06;
     final contentWidth = width - margin * 2;
@@ -62,7 +60,7 @@ class LabelImageRenderer {
     _drawText(canvas, text, textRect);
 
     final picture = recorder.endRecording();
-    final image = await picture.toImage(size.width, size.height);
+    final image = await picture.toImage(labelPixelSize, labelPixelSize);
     final blackAndWhiteImage = await _toPureBlackAndWhite(image);
     final pngBytes = await blackAndWhiteImage.toByteData(
       format: ui.ImageByteFormat.png,

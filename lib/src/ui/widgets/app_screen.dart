@@ -49,6 +49,7 @@ class AppScreen extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: ListView(
+            key: const Key('appScreenScrollView'),
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
               if (screenTitle != null) ...[
