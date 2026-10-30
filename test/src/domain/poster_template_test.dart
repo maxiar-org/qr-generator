@@ -104,17 +104,17 @@ void main() {
       File('assets/templates/templates.json').readAsStringSync(),
     );
 
-    test('tiene un template por cada tipo de QR, sin frame explícito', () {
-      expect(templates, hasLength(4));
+    test('tiene dos templates por cada tipo de QR, sin frame explícito', () {
+      expect(templates, hasLength(8));
       for (final template in templates) {
         expect(template.frame, isNull);
         expect(File(template.image).existsSync(), isTrue);
       }
     });
 
-    test('cada tipo de QR tiene exactamente un template', () {
+    test('cada tipo de QR tiene exactamente dos templates', () {
       for (final type in QrLabelType.values) {
-        expect(templatesForType(templates, type), hasLength(1));
+        expect(templatesForType(templates, type), hasLength(2));
       }
     });
   });
