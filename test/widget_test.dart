@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -11,13 +12,6 @@ import 'package:qr_generator/src/ui/label_preview_screen.dart';
 
 // Check the actual printed QR pixels, not just the route arguments.
 Future<void> expectPrintedUrl(WidgetTester tester, String url) async {
-  for (var attempt = 0; attempt < 100; attempt++) {
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 20)),
-    );
-    await tester.pump();
-    if (find.byType(ExportActions).evaluate().isNotEmpty) break;
-  }
   if (find.byType(ExportActions).evaluate().isEmpty) {
     // El selector de templates puede empujar la etiqueta fuera del
     // viewport inicial: hace falta bajar el scroll para que el ListView
@@ -33,6 +27,18 @@ Future<void> expectPrintedUrl(WidgetTester tester, String url) async {
           )
           .first,
     );
+  }
+  // ExportActions ya está en el árbol apenas se arma la pantalla, pero sus
+  // bytes llegan después (la imagen imprimible se renderiza en segundo
+  // plano): esperá a que estén listos antes de leerlos.
+  Uint8List? bytes;
+  for (var attempt = 0; attempt < 100; attempt++) {
+    bytes = tester.widget<ExportActions>(find.byType(ExportActions)).bytes;
+    if (bytes != null) break;
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 20)),
+    );
+    await tester.pump();
   }
   final actions = tester.widget<ExportActions>(find.byType(ExportActions));
   expect(actions.url, url);

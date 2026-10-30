@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../domain/label_size.dart';
 import '../domain/poster_template.dart';
 import '../domain/qr_label_type.dart';
 import '../printing/label_image_renderer.dart';
@@ -24,7 +23,7 @@ Future<List<PosterTemplate>> _loadBundledTemplateCatalog() =>
     );
 
 /// Vista previa de la etiqueta a imprimir para un [QrLabelType], con el
-/// cartel de cartelería real que le corresponde y texto editable.
+/// cartel de cartelería real que le corresponde.
 class LabelPreviewScreen extends StatefulWidget {
   const LabelPreviewScreen({
     super.key,
@@ -58,8 +57,7 @@ class LabelPreviewScreen extends StatefulWidget {
 class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
   late final LabelImageRenderer _renderer;
   late final LabelExporter _exporter;
-  late final TextEditingController _textController;
-  late Future<Uint8List> _imageFuture;
+  late final Future<Uint8List> _imageFuture;
   late final Future<List<PosterTemplate>> _templatesFuture;
   PosterTemplate? _selectedTemplate;
 
@@ -68,33 +66,23 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
     super.initState();
     _exporter = LabelExporter();
     _renderer = widget.renderer ?? const LabelImageRenderer();
-    _textController = TextEditingController(text: widget.type.defaultText);
     _imageFuture = _render();
-    _templatesFuture = (widget.loadTemplateCatalog ?? _loadBundledTemplateCatalog)()
-        .then((all) => templatesForType(all, widget.type))
-        .then((filtered) {
-          if (mounted && filtered.isNotEmpty) {
-            setState(() => _selectedTemplate = filtered.first);
-          }
-          return filtered;
-        });
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    super.dispose();
+    _templatesFuture =
+        (widget.loadTemplateCatalog ?? _loadBundledTemplateCatalog)()
+            .then((all) => templatesForType(all, widget.type))
+            .then((filtered) {
+              if (mounted && filtered.isNotEmpty) {
+                setState(() => _selectedTemplate = filtered.first);
+              }
+              return filtered;
+            });
   }
 
   Future<Uint8List> _render() => _renderer.render(
     qrData: widget.qrData,
     type: widget.type,
-    text: _textController.text,
+    text: widget.type.defaultText,
   );
-
-  void _refresh() => setState(() {
-    _imageFuture = _render();
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -154,49 +142,19 @@ class _LabelPreviewScreenState extends State<LabelPreviewScreen> {
             );
           },
         ),
-        TextField(
-          controller: _textController,
-          decoration: const InputDecoration(labelText: 'Texto de la etiqueta'),
-          onChanged: (_) => _refresh(),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          '$labelPixelSize x $labelPixelSize px',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: AppSpacing.sm),
         FutureBuilder<Uint8List>(
           future: _imageFuture,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             }
-            final bytes = snapshot.data;
-            if (bytes == null) {
-              return const Padding(
-                padding: EdgeInsets.all(AppSpacing.xl),
-                child: Center(child: Text('Generando…')),
-              );
-            }
-            return Column(
-              children: [
-                Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    child: Image.memory(bytes, gaplessPlayback: true),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                ExportActions(
-                  bytes: snapshot.connectionState == ConnectionState.done
-                      ? bytes
-                      : null,
-                  url: widget.qrData,
-                  exporter: _exporter,
-                  isPaymentPayload: widget.type == QrLabelType.mercadoPago,
-                ),
-              ],
+            return ExportActions(
+              bytes: snapshot.connectionState == ConnectionState.done
+                  ? snapshot.data
+                  : null,
+              url: widget.qrData,
+              exporter: _exporter,
+              isPaymentPayload: widget.type == QrLabelType.mercadoPago,
             );
           },
         ),

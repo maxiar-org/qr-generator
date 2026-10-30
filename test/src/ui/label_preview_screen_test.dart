@@ -48,7 +48,7 @@ class _RecordingRenderer extends LabelImageRenderer {
 Future<List<PosterTemplate>> _noTemplates() async => const [];
 
 void main() {
-  testWidgets('keeps the supplied review URL when editing the label', (
+  testWidgets('keeps the supplied review URL for the export actions', (
     tester,
   ) async {
     final renderer = _RecordingRenderer();
@@ -65,58 +65,37 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), 'Gracias por venir');
-    await tester.pumpAndSettle();
-    expect(renderer.receivedData, [reviewUrl, reviewUrl]);
+    expect(renderer.receivedData, [reviewUrl]);
     expect(
       tester.widget<ExportActions>(find.byType(ExportActions)).url,
       reviewUrl,
     );
   });
 
-  testWidgets('shows the default text, the fixed size and a preview', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: LabelPreviewScreen(
-          type: QrLabelType.whatsapp,
-          qrData: 'https://instagram.com/comercio',
-          renderer: const _FakeRenderer(),
-          loadTemplateCatalog: _noTemplates,
+  testWidgets(
+    'renders the label with the default text, without showing it or the TextField',
+    (tester) async {
+      final renderer = _RecordingRenderer();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LabelPreviewScreen(
+            type: QrLabelType.whatsapp,
+            qrData: 'https://instagram.com/comercio',
+            renderer: renderer,
+            loadTemplateCatalog: _noTemplates,
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(AppBar, 'Generador de QR'), findsOneWidget);
-    expect(find.text('WhatsApp'), findsOneWidget);
-    expect(find.text(QrLabelType.whatsapp.defaultText), findsOneWidget);
-    expect(find.text('464 x 464 px'), findsOneWidget);
-    expect(find.byType(Image), findsOneWidget);
-  });
-
-  testWidgets('editing the text replaces the default in the preview', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: LabelPreviewScreen(
-          type: QrLabelType.googleReviews,
-          qrData: 'https://instagram.com/comercio',
-          renderer: const _FakeRenderer(),
-          loadTemplateCatalog: _noTemplates,
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byType(TextField), 'Gracias por tu visita');
-    await tester.pumpAndSettle();
-
-    expect(find.text('Gracias por tu visita'), findsOneWidget);
-    expect(find.text(QrLabelType.googleReviews.defaultText), findsNothing);
-  });
+      expect(find.widgetWithText(AppBar, 'Generador de QR'), findsOneWidget);
+      expect(find.text('WhatsApp'), findsOneWidget);
+      expect(find.byType(TextField), findsNothing);
+      expect(find.text(QrLabelType.whatsapp.defaultText), findsNothing);
+      expect(find.text('464 x 464 px'), findsNothing);
+      expect(find.byType(Image), findsNothing);
+    },
+  );
 
   group('selector de templates', () {
     // Catálogo de prueba con la misma forma que assets/templates/templates.json,
@@ -195,6 +174,47 @@ void main() {
           for (final otherName in allOtherNames) {
             expect(find.text(otherName), findsNothing);
           }
+        },
+      );
+    }
+
+    for (final type in QrLabelType.values) {
+      testWidgets(
+        'para ${type.name} no hay TextField y están los tres botones de acción',
+        (tester) async {
+          await tester.binding.setSurfaceSize(const Size(400, 2200));
+          addTearDown(() => tester.binding.setSurfaceSize(null));
+          await tester.pumpWidget(
+            MaterialApp(
+              home: LabelPreviewScreen(
+                type: type,
+                qrData: 'contenido de prueba',
+                renderer: const _FakeRenderer(),
+                loadTemplateCatalog: loadFakeCatalog,
+                templateFrameResolver: instantFrame,
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          expect(find.byType(TextField), findsNothing);
+          expect(
+            find.widgetWithText(FilledButton, 'Guardar imagen'),
+            findsOneWidget,
+          );
+          expect(
+            find.widgetWithText(
+              OutlinedButton,
+              type == QrLabelType.mercadoPago
+                  ? 'Copiar contenido'
+                  : 'Copiar link',
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.widgetWithText(TextButton, 'Cómo imprimir con WePrint'),
+            findsOneWidget,
+          );
         },
       );
     }
